@@ -15,6 +15,20 @@
       "when": 1760357744832,
       "tag": "0001_rainy_maestro",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1760358153457,
+      "tag": "0002_strange_deadpool",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1760359047834,
+      "tag": "0003_colorful_husk",
+      "breakpoints": true
     }
   ]
 }
