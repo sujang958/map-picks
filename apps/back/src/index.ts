@@ -1,23 +1,34 @@
 import jwt from "@elysiajs/jwt";
 import { Elysia } from "elysia";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
+import { teams } from "./db/schema";
 
 const app = new Elysia()
   .use(jwt({ name: "jwt", secret: process.env.JWT_SECRET! }))
   .get("/", () => "Hello Elysia")
-  .get('/login/:pin', async ({ jwt, params: { name }, cookie: { auth } }) => {
-    const value = await jwt.sign({ name })
+  .get('/login/:id', async ({ jwt, params: { id }, cookie: { auth } }) => {
+    const result = await db.query.teams.findFirst({ where: eq(teams.id, id) })
+
+    if (!result) return 'No such team'
+
+    const value = await jwt.sign({ id })
 
     auth.set({
       value,
       httpOnly: true,
-      maxAge: 7 * 86400,
+      maxAge: 0.5 * 86400,
     })
 
-    return `Sign in as ${value}`
+    return `Signed in as ${result.name}` // redirect to frontend page
   })
   .ws("/ws", {
-    message(ws, message,) {
-      // const team = ws.data.jwt.verify(ws.data.cookie.auth.value!)
+    async message(ws, message,) {
+      const team = await ws.data.jwt.verify(ws.data.cookie.auth.value as string)
+
+      if (!team) return
+
+      ws.send(`Hello ${team.name}, you sent: ${message}`);
     },
   })
 

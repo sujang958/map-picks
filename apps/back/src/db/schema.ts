@@ -1,20 +1,20 @@
 import { relations, sql } from 'drizzle-orm';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-export const teamsTable = sqliteTable('teams', {
+export const teams = sqliteTable('teams', {
   id: text('id')
     .primaryKey()
     .notNull()
     .default(sql`(lower(hex(randomblob(8))))`),
 
-  name: text('name', { length: 32 }).notNull().unique(),
+  name: text('name', { length: 32 }).notNull(),
 
   createdAt: text('created_at')
     .default(sql`(CURRENT_TIMESTAMP)`)
     .notNull(),
 });
 
-export const matchesTable = sqliteTable('matches', {
+export const matches = sqliteTable('matches', {
   id: text('id')
     .primaryKey()
     .notNull()
@@ -35,7 +35,7 @@ export const matchesTable = sqliteTable('matches', {
     .notNull(),
 });
 
-export const mapPoolsTable = sqliteTable('mapPools', {
+export const mapPools = sqliteTable('mapPools', {
   id: integer('id').primaryKey(),
   maps: text('maps', { mode: 'json' })
     .notNull()
@@ -46,19 +46,19 @@ export const mapPoolsTable = sqliteTable('mapPools', {
     .notNull(),
 });
 
-export const teamsRelations = relations(teamsTable, ({ many }) => ({
-  matches: many(matchesTable),
+export const teamsRelations = relations(teams, ({ many }) => ({
+  matches: many(matches),
 }));
 
-export const matchesRelations = relations(matchesTable, ({ one }) => ({
-  mapPool: one(mapPoolsTable, { fields: [matchesTable.mapPoolId], references: [mapPoolsTable.id] }),
-  t1: one(teamsTable, { fields: [matchesTable.t1Id], references: [teamsTable.id] }),
-  t2: one(teamsTable, { fields: [matchesTable.t2Id], references: [teamsTable.id] }),
+export const matchesRelations = relations(matches, ({ one }) => ({
+  mapPool: one(mapPools, { fields: [matches.mapPoolId], references: [mapPools.id] }),
+  t1: one(teams, { fields: [matches.t1Id], references: [teams.id] }),
+  t2: one(teams, { fields: [matches.t2Id], references: [teams.id] }),
 }));
 
-export const mapPoolsRelations = relations(mapPoolsTable, ({ many }) => ({
-  matches: many(matchesTable),
+export const mapPoolsRelations = relations(mapPools, ({ many }) => ({
+  matches: many(matches),
 }));
 
-export type InsertMatch = typeof matchesTable.$inferInsert;
-export type SelectMatch = typeof matchesTable.$inferSelect;
+export type InsertMatch = typeof matches.$inferInsert;
+export type SelectMatch = typeof matches.$inferSelect;
