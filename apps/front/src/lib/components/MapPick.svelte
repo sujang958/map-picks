@@ -1,5 +1,5 @@
 <script lang="ts">
-	let { type = 'Veto', team = 'T1', enemyTeam = null, enemyPicks = 'DEFENSE' } = $props();
+	let { type = 'Veto', team = 'T1', enemyTeam = null, enemyPicks = 'DEFENSE', map = "" } = $props();
 </script>
 
 <div class="relative flex h-44 flex-col gap-y-2 bg-[url(/split.avif)] bg-contain text-white">
