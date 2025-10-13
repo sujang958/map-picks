@@ -9,6 +9,10 @@
 			console.log('WebSocket connection opened');
 			ws.send('Hello Server!');
 		};
+
+		ws.onmessage = (event) => {
+			console.log('Message from server:', event.data);
+		};
 	});
 </script>
 

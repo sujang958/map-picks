@@ -6,7 +6,11 @@ import { teams } from "./db/schema";
 
 const app = new Elysia()
   .use(jwt({ name: "jwt", secret: process.env.JWT_SECRET! }))
-  .get("/", () => "Hello Elysia")
+  .get("/", ({ cookie }) => {
+    console.log(cookie)
+
+    return "Hello Elysia"
+  })
   .get('/login/:id', async ({ jwt, params: { id }, cookie: { auth } }) => {
     const result = await db.query.teams.findFirst({ where: eq(teams.id, id) })
 
@@ -18,6 +22,7 @@ const app = new Elysia()
       value,
       httpOnly: true,
       maxAge: 0.5 * 86400,
+
     })
 
     return `Signed in as ${result.name}` // redirect to frontend page
@@ -26,13 +31,15 @@ const app = new Elysia()
     async message(ws, message,) {
       const team = await ws.data.jwt.verify(ws.data.cookie.auth.value as string)
 
+      console.log(ws.data.cookie, team)
+
       if (!team) return
 
-      ws.send(`Hello ${team.name}, you sent: ${message}`);
+      ws.send(`Hello ${team.id}, you sent: ${message}`);
     },
   })
 
-
+// TODO: just create a passwor dor at least simple pin and make a frontend page for that not a big deal right?
 
 
 app.listen(3000);
