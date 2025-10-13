@@ -1,0 +1,1 @@
+DROP INDEX `teams_name_unique`;
