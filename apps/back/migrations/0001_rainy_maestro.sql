@@ -1,0 +1,1 @@
+ALTER TABLE `matches` ADD `map_picks` text NOT NULL;
