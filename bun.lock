@@ -9,7 +9,7 @@
         "typescript": "5.9.2",
       },
     },
-    "apps/back": {
+    "apps/app": {
       "name": "app",
       "version": "1.0.50",
       "dependencies": {
@@ -212,7 +212,7 @@
 
     "acorn": ["acorn@8.15.0", "", { "bin": { "acorn": "bin/acorn" } }, "sha512-NZyJarBfL7nWwIq+FDL6Zp/yHEhePMNnnJ0y3qfieCrmNvYct8uvtiV41UvlSe6apAfk0fY1FbWx+NwfmpvtTg=="],
 
-    "app": ["app@workspace:apps/back"],
+    "app": ["app@workspace:apps/app"],
 
     "aria-query": ["aria-query@5.3.2", "", {}, "sha512-COROpnaoap1E2F000S62r6A60uHZnmlvomhfyT2DlTcrY1OrBKn2UhH7qn5wTC9zMvD0AY7csdPSNwKP+7WiQw=="],
 
