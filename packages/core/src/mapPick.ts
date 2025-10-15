@@ -10,7 +10,7 @@ export interface MapPickProps {
 }
 
 export type Veto = { map: string }
-export type Select = { map: string, enemyTeamPick: Side }
+export type Select = { map: string, enemyTeamPick: Side | "WAITING..." }
 export interface JSONMatchMapPicks {
   version: "1.0";
   t1Id: string;
@@ -58,13 +58,19 @@ export class MatchMapPicks {
     return this.turn % 2 === 0;
   }
 
+  get lastSelectedMap() {
+    if (this.t1Select.length <= 0) return null;
+    if (this.t1Select.length === this.t2Select.length) return { teamId: this.t2Id, map: this.t2Select.at(-1)! };
+    return { teamId: this.t1Id, map: this.t1Select.at(-1)! };
+  }
+
   validateTurn(teamId: string) {
     //TODO: this.t1Select.concat(this.t2Select)
 
     return (this.isT1Turn && teamId === this.t1Id) || (!this.isT1Turn && teamId === this.t2Id);
   }
 
-  veto(teamId: string, map: string) {
+  veto({ teamId, map }: Veto & { teamId: string }) {
     if (!this.availableMaps.includes(map)) return false
     if (!this.validateTurn(teamId)) return false
     // if (this.turn >= this.bestOf * 2 - 1) return false
@@ -75,9 +81,11 @@ export class MatchMapPicks {
       this.t2Veto.push({ map });
 
     this.turn++;
+
+    return true
   }
 
-  select(teamId: string, map: string, enemyTeamPick: Side) {
+  select({ teamId, map, enemyTeamPick }: Select & { teamId: string }) {
     if (!this.availableMaps.includes(map)) return false
     if (!this.validateTurn(teamId)) return false
 
@@ -87,6 +95,22 @@ export class MatchMapPicks {
       this.t2Select.push({ map, enemyTeamPick });
 
     this.turn++;
+
+    return true
+  }
+
+  pickSide({ teamId, side }: { teamId: string, side: Side }) {
+    if (!this.validateTurn(teamId)) return false
+    if (!this.lastSelectedMap) return false
+
+    const { teamId: who, map: lastSelectedMap } = this.lastSelectedMap;
+    if (lastSelectedMap.enemyTeamPick !== "WAITING..." || (who == teamId)) return false
+
+    lastSelectedMap.enemyTeamPick = side;
+
+    this.turn++;
+
+    return true
   }
 
   static fromJson(json: unknown): MatchMapPicks {

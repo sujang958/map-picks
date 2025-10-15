@@ -6,6 +6,7 @@ import { matches, teams } from "./db/schema";
 import type { WSRequest, WSResponse } from "@self/types/ws";
 import typia from "typia";
 import ErrorResponse from "./ws/Error";
+import DecisionMade from "./ws/DecisionMade";
 
 const app = new Elysia()
   .use(jwt({ name: "jwt", secret: process.env.JWT_SECRET! }))
@@ -30,29 +31,16 @@ const app = new Elysia()
 
     return `Signed in as ${result.name}` // redirect to frontend page
   })
-  .ws("/ws", {
-    async message(ws, message,) {
+  .ws("/ws/:matchId", {
+    async message(ws, message) {
+      const matchId = ws.data.params.matchId
       const team = await ws.data.jwt.verify(ws.data.cookie.auth.value as string)
-
-      console.log(ws.data.cookie, team)
 
       if (!team) return
 
-
-      // Validation
       const request = typia.assert<WSRequest>(JSON.parse(String(message)))
-
-      if (request.type !== "MATCH.DECISION_MADE") return
-
-      const matchId = request.payload.matchId
-      const match = await db.query.matches.findFirst({ where: eq(matches.id, matchId), with: { mapPool: true, t1: true, t2: true } })
-
-      if (!match)
-        return ws.send(JSON.stringify(ErrorResponse("Match not found")))
-      if (match.t1.id !== team.id && match.t2.id !== team.id)
-        return ws.send(JSON.stringify(ErrorResponse("Not your match")))
-
-      const isT1 = match.t1.id === team.id
+      if (request.type == "MATCH.DECISION_MADE")
+        return ws.send(JSON.stringify(DecisionMade({ teamId: team.id as string, decision: request.payload, matchId })))
     },
   })
 

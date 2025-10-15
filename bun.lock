@@ -15,6 +15,7 @@
       "dependencies": {
         "@elysiajs/jwt": "^1.4.0",
         "@libsql/client": "^0.15.15",
+        "@self/core": "workspace:*",
         "dotenv": "^17.2.3",
         "drizzle-orm": "^0.44.6",
         "elysia": "latest",

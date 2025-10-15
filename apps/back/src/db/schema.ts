@@ -21,7 +21,7 @@ export const matches = sqliteTable('matches', {
     .default(sql`(lower(hex(randomblob(16))))`),
 
   mapPoolId: integer('map_pool_id').notNull(),
-  mapPicks: text('map_picks', { mode: "json" }).$type<{ t1Select: string[], t1Veto: string[], t2Select: string[], t2Veto: string[] }>().notNull(),
+  mapPicks: text('map_picks', { mode: "json" }).notNull(),
 
   t1Id: text('t1_id')
     .notNull(),
