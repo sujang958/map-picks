@@ -7,6 +7,7 @@ import type { WSRequest, WSResponse } from "@self/types/ws";
 import typia from "typia";
 import ErrorResponse from "./ws/Error";
 import DecisionMade from "./ws/DecisionMade";
+import Open from "./ws/Open";
 
 const app = new Elysia()
   .use(jwt({ name: "jwt", secret: process.env.JWT_SECRET! }))
@@ -36,7 +37,7 @@ const app = new Elysia()
       const matchId = ws.data.params.matchId
       const team = await ws.data.jwt.verify(ws.data.cookie.auth.value as string)
 
-      ws.send(JSON.stringify({ type: "CONNECTED", payload: { matchId } }))
+      ws.send(JSON.stringify(await Open({ matchId, teamId: team ? team.id : undefined })))
     },
     async close(ws) { },
     async message(ws, message) {

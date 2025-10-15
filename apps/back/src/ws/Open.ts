@@ -3,14 +3,12 @@ import { db } from "../db";
 import { WSHandler } from "./types";
 import { matches } from "../db/schema";
 
-const Open: WSHandler = async ({ matchId, teamId }: { matchId: string, teamId: string }) => {
-  const match = await db.query.matches.findFirst({ where: eq(matches.id, matchId), with: { mapPool: true, t1: true, t2: true } })
+const Open: WSHandler = async ({ matchId, teamId }: { matchId: string, teamId?: string }) => {
+  const match = await db.query.matches.findFirst({ where: eq(matches.id, matchId) })
   if (!match)
     return { type: "ERROR", message: "Match not found" }
-  if (match.t1.id !== teamId && match.t2.id !== teamId)
-    return { type: "MATCH.NEW_STATE", payload: { ...match.mapPicks, canParticipate: false } }
 
-  return { type: "MATCH.NEW_STATE", payload: { ...match.mapPicks, canParticipate: true } }
+  return { type: "MATCH.NEW_STATE", payload: { ...match.mapPicks, canParticipate: (match.t1Id === teamId || match.t2Id === teamId) ? true : false } }
 }
 
 export default Open
