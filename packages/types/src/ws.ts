@@ -1,6 +1,4 @@
-import type { JSONMatchMapPicks } from "@self/core"
-
-export type Side = "Attack" | "Defense"
+import type { JSONMatchMapPicks, Side } from "@self/core"
 
 // export type PickByType<T, K> = T extends { type: K } ? T : never;
 

@@ -1,5 +1,6 @@
-import type { Side } from "@self/types/ws";
 import typia from "typia";
+
+export type Side = "Attack" | "Defense"
 
 export interface MapPickProps {
   t1Id: string;

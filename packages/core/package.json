@@ -10,7 +10,6 @@
     "ts-patch": "^3.3.0"
   },
   "dependencies": {
-    "@self/types": "workspace:*",
     "typia": "^9.7.2"
   },
   "peerDependencies": {
