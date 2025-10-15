@@ -115,15 +115,17 @@ export class MatchMapPicks {
   }
 
   static fromJson(json: unknown): MatchMapPicks {
-    if (!typia.is<JSONMatchMapPicks>(json)) throw new Error("Invalid JSON");
+    const data = typeof json === 'string' ? JSON.parse(json) : json;
+
+    if (!typia.is<JSONMatchMapPicks>(data)) throw new Error("Invalid JSON");
 
     const instance = new MatchMapPicks({
-      ...json
+      ...data
     });
-    instance.t1Veto.push(...json.t1Veto);
-    instance.t1Select.push(...json.t1Select);
-    instance.t2Veto.push(...json.t2Veto);
-    instance.t2Select.push(...json.t2Select);
+    instance.t1Veto.push(...data.t1Veto);
+    instance.t1Select.push(...data.t1Select);
+    instance.t2Veto.push(...data.t2Veto);
+    instance.t2Select.push(...data.t2Select);
 
     return instance;
   }

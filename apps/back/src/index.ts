@@ -8,6 +8,7 @@ import typia from "typia";
 import ErrorResponse from "./ws/Error";
 import DecisionMade from "./ws/DecisionMade";
 import Open from "./ws/Open";
+import { MatchMapPicks } from "@self/core";
 
 const app = new Elysia()
   .use(jwt({ name: "jwt", secret: process.env.JWT_SECRET! }))
@@ -34,6 +35,18 @@ const app = new Elysia()
   })
   .ws("/ws/:matchId", {
     async open(ws) {
+      console.log(new MatchMapPicks({
+        bestOf: 3, mapPool: [
+          "Lotus",
+          "Ascent",
+          "Pearl",
+          "Bind",
+          "Haven",
+          "Sunset",
+          "Abyss"
+        ], t1Id: "9fc0204fdbe4cd04", t2Id: "654fa6869711c496",
+      }).toJSON())
+
       const matchId = ws.data.params.matchId
       const team = await ws.data.jwt.verify(ws.data.cookie.auth.value as string)
 

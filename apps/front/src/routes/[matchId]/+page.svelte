@@ -1,9 +1,18 @@
 <script lang="ts">
 	import MapPick from '$lib/components/MapPick.svelte';
 	import { onDestroy, onMount } from 'svelte';
+	import type { PageProps } from './$types';
+	import typia from 'typia';
+	import type { WSResponse } from '@self/types/ws';
+	import { MatchMapPicks, type JSONMatchMapPicks } from '@self/core';
+
+	let { params }: PageProps = $props();
+
+	let matchMapPicks: JSONMatchMapPicks | null = $state(null); // class or object? MatchMapPicks vs JSONMatchMapPicks
+	let canParticipate = $state(false);
 
 	onMount(() => {
-		const ws = new WebSocket('ws://localhost:3000/ws');
+		const ws = new WebSocket(`ws://localhost:3000/ws/${params.matchId}`);
 
 		ws.onopen = () => {
 			console.log('WebSocket connection opened');
@@ -12,6 +21,15 @@
 
 		ws.onmessage = (event) => {
 			console.log('Message from server:', event.data);
+
+			const res = JSON.parse(event.data);
+
+			if (!typia.is<WSResponse>(res)) return;
+
+			if (res.type === 'MATCH.NEW_STATE') {
+				matchMapPicks = res.payload;
+				canParticipate = res.payload.canParticipate;
+			}
 		};
 	});
 </script>
@@ -49,7 +67,7 @@
 				</header>
 			</div>
 			<div>
-				<header class="text-right">
+				<header class="text-right opacity-50">
 					<p class="flex flex-row items-center gap-x-2 text-xl font-semibold">
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
