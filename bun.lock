@@ -48,6 +48,18 @@
         "vite": "^7.1.7",
       },
     },
+    "packages/core": {
+      "name": "@self/core",
+      "dependencies": {
+        "@self/types": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "packages/types": {
       "name": "@self/types",
       "devDependencies": {
@@ -212,6 +224,8 @@
     "@rollup/rollup-win32-x64-msvc": ["@rollup/rollup-win32-x64-msvc@4.52.4", "", { "os": "win32", "cpu": "x64" }, "sha512-bf9PtUa0u8IXDVxzRToFQKsNCRz9qLYfR/MpECxl4mRoWYjAeFjgxj1XdZr2M/GNVpT05p+LgQOHopYDlUu6/w=="],
 
     "@samchon/openapi": ["@samchon/openapi@4.7.2", "", {}, "sha512-yj6kGWHtKK85wfJXrSmWqLWjfCd98SAvCTsVDlej2s7OfXXHqA4hmgPRNrAPIQRVi00xn26qL1PChjq1MhzlRQ=="],
+
+    "@self/core": ["@self/core@workspace:packages/core"],
 
     "@self/types": ["@self/types@workspace:packages/types"],
 
