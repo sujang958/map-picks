@@ -1,0 +1,14 @@
+{
+  "name": "@self/types",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "exports": {
+    "./ws": "./src/ws.ts"
+  },
+  "private": true,
+  "type": "module"
+}

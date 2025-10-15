@@ -10,10 +10,12 @@
     "@libsql/client": "^0.15.15",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.44.6",
-    "elysia": "latest"
+    "elysia": "latest",
+    "typia": "^9.7.2"
   },
   "devDependencies": {
     "bun-types": "latest",
+    "@self/types": "workspace:*",
     "drizzle-kit": "^0.31.5"
   },
   "module": "src/index.js"

@@ -2,7 +2,10 @@ import jwt from "@elysiajs/jwt";
 import { Elysia } from "elysia";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
-import { teams } from "./db/schema";
+import { matches, teams } from "./db/schema";
+import type { WSRequest, WSResponse } from "@self/types/ws";
+import typia from "typia";
+import ErrorResponse from "./ws/Error";
 
 const app = new Elysia()
   .use(jwt({ name: "jwt", secret: process.env.JWT_SECRET! }))
@@ -35,7 +38,21 @@ const app = new Elysia()
 
       if (!team) return
 
-      ws.send(`Hello ${team.id}, you sent: ${message}`);
+
+      // Validation
+      const request = typia.assert<WSRequest>(JSON.parse(String(message)))
+
+      if (request.type !== "MATCH.DECISION_MADE") return
+
+      const matchId = request.payload.matchId
+      const match = await db.query.matches.findFirst({ where: eq(matches.id, matchId), with: { mapPool: true, t1: true, t2: true } })
+
+      if (!match)
+        return ws.send(JSON.stringify(ErrorResponse("Match not found")))
+      if (match.t1.id !== team.id && match.t2.id !== team.id)
+        return ws.send(JSON.stringify(ErrorResponse("Not your match")))
+
+      const isT1 = match.t1.id === team.id
     },
   })
 
