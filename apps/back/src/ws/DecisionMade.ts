@@ -1,5 +1,5 @@
 import { Decision, WSResponse } from "@self/types/ws"
-import { ResponseFunction } from "./types"
+import { WSHandler } from "./types"
 import { db } from "../db"
 import { eq } from "drizzle-orm"
 import { matches } from "../db/schema"
@@ -31,7 +31,7 @@ const DecisionMade = async ({ matchId, teamId, decision }: { teamId: string, dec
   const changed = matchMapPicks.toJSON()
   await db.update(matches).set({ mapPicks: changed }).where(eq(matches.id, matchId))
 
-  return { type: "MATCH.NEW_STATE", payload: changed }
+  return { type: "MATCH.NEW_STATE", payload: { ...changed, canParticipate: true } }
 }
 
 export default DecisionMade

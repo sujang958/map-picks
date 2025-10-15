@@ -1,3 +1,3 @@
 import { WSResponse } from "@self/types/ws";
 
-export type ResponseFunction = (data: any) => WSResponse
+export type WSHandler = (data: any) => Promise<WSResponse>

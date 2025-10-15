@@ -1,3 +1,4 @@
+import { JSONMatchMapPicks } from '@self/core';
 import { relations, sql } from 'drizzle-orm';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
@@ -21,7 +22,7 @@ export const matches = sqliteTable('matches', {
     .default(sql`(lower(hex(randomblob(16))))`),
 
   mapPoolId: integer('map_pool_id').notNull(),
-  mapPicks: text('map_picks', { mode: "json" }).notNull(),
+  mapPicks: text('map_picks', { mode: "json" }).$type<JSONMatchMapPicks>().notNull(),
 
   t1Id: text('t1_id')
     .notNull(),

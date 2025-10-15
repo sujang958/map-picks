@@ -1,6 +1,6 @@
-import { ResponseFunction } from "./types"
+import { WSHandler } from "./types"
 
-const ErrorResponse: ResponseFunction = (message: string) => ({
+const ErrorResponse: WSHandler = (message: string) => ({
   type: "ERROR",
   message,
 })

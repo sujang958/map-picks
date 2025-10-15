@@ -65,6 +65,9 @@
     },
     "packages/types": {
       "name": "@self/types",
+      "dependencies": {
+        "@self/core": "workspace:*",
+      },
       "devDependencies": {
         "@types/bun": "latest",
       },

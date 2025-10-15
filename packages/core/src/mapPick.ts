@@ -127,7 +127,7 @@ export class MatchMapPicks {
     return instance;
   }
 
-  toJSON() {
+  toJSON(): JSONMatchMapPicks {
     return {
       version: "1.0",
       t1Id: this.t1Id,

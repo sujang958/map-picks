@@ -32,6 +32,13 @@ const app = new Elysia()
     return `Signed in as ${result.name}` // redirect to frontend page
   })
   .ws("/ws/:matchId", {
+    async open(ws) {
+      const matchId = ws.data.params.matchId
+      const team = await ws.data.jwt.verify(ws.data.cookie.auth.value as string)
+
+      ws.send(JSON.stringify({ type: "CONNECTED", payload: { matchId } }))
+    },
+    async close(ws) { },
     async message(ws, message) {
       const matchId = ws.data.params.matchId
       const team = await ws.data.jwt.verify(ws.data.cookie.auth.value as string)

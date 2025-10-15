@@ -9,6 +9,9 @@
   "exports": {
     "./ws": "./src/ws.ts"
   },
+  "dependencies": {
+    "@self/core": "workspace:*"
+  },
   "private": true,
   "type": "module"
 }

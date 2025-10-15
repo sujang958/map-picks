@@ -1,10 +1,12 @@
+import type { JSONMatchMapPicks } from "@self/core"
+
 export type Side = "Attack" | "Defense"
 
 // export type PickByType<T, K> = T extends { type: K } ? T : never;
 
 export type WSResponse = {
   type: "MATCH.NEW_STATE"
-  payload: any  // TODO: just copy from backend
+  payload: JSONMatchMapPicks & { canParticipate: boolean }  // TODO: just copy from backend
 } | { type: "ERROR", message: string }
 
 // type a = Pick<WSResponse, { type: "ERROR" }> // TODO: how to do this shit bruh
