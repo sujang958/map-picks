@@ -1,34 +1,48 @@
 import type { Side } from "@self/types/ws";
+import typia from "typia";
 
 export interface MapPickProps {
   t1Id: string;
   t2Id: string;
   mapPool: string[]
-  bestOf: 1 | 3 | 5;
+  bestOf: 3
+  turn?: number
 }
 
 export type Veto = { map: string }
 export type Select = { map: string, enemyTeamPick: Side }
+export interface JSONMatchMapPicks {
+  version: "1.0";
+  t1Id: string;
+  t2Id: string;
+  mapPool: string[];
+  bestOf: 3;
+  t1Veto: Veto[];
+  t1Select: Select[];
+  t2Veto: Veto[];
+  t2Select: Select[];
+  turn: number;
+}
 
 export class MatchMapPicks {
   public readonly t1Id: string;
   public readonly t2Id: string;
   public readonly mapPool: string[]
-  public readonly bestOf: 1 | 3 | 5;
+  public readonly bestOf: 3
 
   public readonly t1Veto: Veto[] = [];
   public readonly t1Select: Select[] = [];
   public readonly t2Veto: Veto[] = [];
   public readonly t2Select: Select[] = [];
 
-  private turn: number = 0 // odd = t1, even = t2
+  private turn: number = 0;
 
-
-  constructor({ t1Id, t2Id, mapPool, bestOf }: MapPickProps) {
+  constructor({ t1Id, t2Id, mapPool, bestOf, turn = 0 }: MapPickProps) {
     this.t1Id = t1Id;
     this.t2Id = t2Id;
     this.mapPool = mapPool;
     this.bestOf = bestOf;
+    this.turn = turn
   }
 
   get availableMaps() {
@@ -40,69 +54,69 @@ export class MatchMapPicks {
     });
   }
 
-  validateTurn(teamId: string) {
-    const isT1Turn = this.turn % 2 === 0;
+  get isT1Turn() {
+    return this.turn % 2 === 0;
+  }
 
-    return (isT1Turn && teamId === this.t1Id) || (!isT1Turn && teamId === this.t2Id);
+  validateTurn(teamId: string) {
+    //TODO: this.t1Select.concat(this.t2Select)
+
+    return (this.isT1Turn && teamId === this.t1Id) || (!this.isT1Turn && teamId === this.t2Id);
   }
 
   veto(teamId: string, map: string) {
-    if (!this.mapPool.includes(map)) {
-      throw new Error("Map not in pool");
-    }
-    if (this.t1Veto.find(v => v.map === map) || this.t2Veto.find(v => v.map === map)) {
-      throw new Error("Map already vetoed");
-    }
-    if (this.t1Select.find(s => s.map === map) || this.t2Select.find(s => s.map === map)) {
-      throw new Error("Map already selected");
-    }
-    if (this.turn >= this.bestOf * 2 - 1) {
-      throw new Error("All picks and vetoes are done");
-    }
-    const isT1 = this.turn % 2 === 0;
-    if ((isT1 && teamId !== this.t1Id) || (!isT1 && teamId !== this.t2Id)) {
-      throw new Error("Not your turn");
-    }
+    if (!this.availableMaps.includes(map)) return false
+    if (!this.validateTurn(teamId)) return false
+    // if (this.turn >= this.bestOf * 2 - 1) return false
 
-    if (isT1) {
+    if (this.isT1Turn)
       this.t1Veto.push({ map });
-    } else {
+    else
       this.t2Veto.push({ map });
-    }
+
     this.turn++;
   }
 
   select(teamId: string, map: string, enemyTeamPick: Side) {
-    if (!this.mapPool.includes(map)) {
-      throw new Error("Map not in pool");
-    }
-    if (this.t1Veto.find(v => v.map === map) || this.t2Veto.find(v => v.map === map)) {
-      throw new Error("Map already vetoed");
-    }
-    if (this.t1Select.find(s => s.map === map) || this.t2Select.find(s => s.map === map)) {
-      throw new Error("Map already selected");
-    }
-    if (this.turn >= this.bestOf * 2 - 1) {
-      throw new Error("All picks and vetoes are done");
-    }
-    const isT1 = this.turn % 2 === 0;
-    if ((isT1 && teamId !== this.t1Id) || (!isT1 && teamId !== this.t2Id)) {
-      throw new Error("Not your turn");
-    }
+    if (!this.availableMaps.includes(map)) return false
+    if (!this.validateTurn(teamId)) return false
 
-    if (isT1) {
+    if (this.isT1Turn)
       this.t1Select.push({ map, enemyTeamPick });
-    } else {
+    else
       this.t2Select.push({ map, enemyTeamPick });
-    }
+
     this.turn++;
   }
 
-  static fromJson() {
-    // return new MatchMapPicks();
+  static fromJson(json: unknown): MatchMapPicks {
+    if (!typia.is<JSONMatchMapPicks>(json)) throw new Error("Invalid JSON");
+
+    const instance = new MatchMapPicks({
+      ...json
+    });
+    instance.t1Veto.push(...json.t1Veto);
+    instance.t1Select.push(...json.t1Select);
+    instance.t2Veto.push(...json.t2Veto);
+    instance.t2Select.push(...json.t2Select);
+
+    return instance;
   }
 
   toJSON() {
-
+    return {
+      version: "1.0",
+      t1Id: this.t1Id,
+      t2Id: this.t2Id,
+      mapPool: this.mapPool,
+      bestOf: this.bestOf,
+      t1Veto: this.t1Veto,
+      t1Select: this.t1Select,
+      t2Veto: this.t2Veto,
+      t2Select: this.t2Select,
+      turn: this.turn,
+    };
   }
 }
+
+// What about just fucking unify typia usage in one package?

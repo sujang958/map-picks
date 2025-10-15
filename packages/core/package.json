@@ -4,12 +4,17 @@
   "type": "module",
   "private": true,
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "ts-patch": "^3.3.0"
   },
   "dependencies": {
-    "@self/types": "workspace:*"
+    "@self/types": "workspace:*",
+    "typia": "^9.7.2"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "~5.9.2"
+  },
+  "scripts": {
+    "prepare": "ts-patch install"
   }
 }
