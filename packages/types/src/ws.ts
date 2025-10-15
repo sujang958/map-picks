@@ -5,6 +5,8 @@ export type WSResponse = {
   payload: any  // TODO: just copy from backend
 } | { type: "ERROR", message: string }
 
+type a = Pick<WSResponse, { type: "ERROR" }> // TODO: how to do this shit bruh
+
 export type WSRequest = {
   type: "MATCH.DECISION_MADE"
   payload: { matchId: string } & ({

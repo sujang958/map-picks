@@ -1,11 +1,13 @@
 import { ResponseFunction } from "./types"
 
 const NewState: ResponseFunction = (matchId: string) => {
-  if 
-  
+
+
   return {
     type: "MATCH.NEW_STATE",
-    payload: 
+    payload: {
+      matchId
+    }
+  }
 }
-
 export default NewState
