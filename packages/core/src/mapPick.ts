@@ -95,7 +95,7 @@ export class MatchMapPicks {
     else
       this.t2Select.push({ map, enemyTeamPick });
 
-    this.turn++;
+    this.turn++; // TODO: maybe remove this to solve picking side?
 
     return true
   }

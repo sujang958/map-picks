@@ -1,6 +1,6 @@
 import { WSHandler } from "./types"
 
-const ErrorResponse: WSHandler = (message: string) => ({
+const ErrorResponse: WSHandler = async (message: string) => ({
   type: "ERROR",
   message,
 })
