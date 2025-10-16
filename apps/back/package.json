@@ -8,11 +8,12 @@
   "dependencies": {
     "@elysiajs/jwt": "^1.4.0",
     "@libsql/client": "^0.15.15",
+    "@self/core": "workspace:*",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.44.6",
     "elysia": "latest",
-    "typia": "^9.7.2",
-    "@self/core": "workspace:*"
+    "postgres": "^3.4.7",
+    "typia": "^9.7.2"
   },
   "devDependencies": {
     "bun-types": "latest",

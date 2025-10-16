@@ -4,9 +4,11 @@ import { db } from "../db"
 import { eq } from "drizzle-orm"
 import { matches } from "../db/schema"
 import { MatchMapPicks } from "@self/core"
+import { getMatch, updateMatchMapPicks } from "../db/utils"
 
 const DecisionMade = async ({ matchId, teamId, decision }: { teamId: string, decision: Decision, matchId: string }): Promise<WSResponse> => {
-  const match = await db.query.matches.findFirst({ where: eq(matches.id, matchId), with: { mapPool: true, t1: true, t2: true } })
+  // const match = await db.query.matches.findFirst({ where: eq(matches.id, matchId), with: { mapPool: true, t1: true, t2: true } })
+  const match = await getMatch(matchId)
 
   if (!match)
     return { type: "ERROR", message: "Match not found" }
@@ -15,7 +17,9 @@ const DecisionMade = async ({ matchId, teamId, decision }: { teamId: string, dec
 
   const matchMapPicks = MatchMapPicks.fromJson(match.mapPicks)
 
-  if (matchMapPicks.isT1Turn && (match.t1.id !== teamId)) return { type: "ERROR", message: "Not your turn" }
+  // TODO: bruh this will cause an error when picking side, so when selecting map, dont turn++ instead after picking side, turn++
+  if (matchMapPicks.isT1Turn && (match.t1.id !== teamId))
+    return { type: "ERROR", message: "Not your turn" }
 
   let success: boolean = false
   if (decision.type == "VETO_MAP")
@@ -29,7 +33,8 @@ const DecisionMade = async ({ matchId, teamId, decision }: { teamId: string, dec
     return { type: "ERROR", message: "Invalid decision" }
 
   const changed = matchMapPicks.toJSON()
-  await db.update(matches).set({ mapPicks: changed }).where(eq(matches.id, matchId))
+
+  await updateMatchMapPicks(matchId, changed)
 
   return { type: "MATCH.NEW_STATE", payload: { ...changed, canParticipate: true } }
 }

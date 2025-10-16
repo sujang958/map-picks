@@ -2,9 +2,10 @@ import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { WSHandler } from "./types";
 import { matches } from "../db/schema";
+import { getMatch } from "../db/utils";
 
 const Open: WSHandler = async ({ matchId, teamId }: { matchId: string, teamId?: string }) => {
-  const match = await db.query.matches.findFirst({ where: eq(matches.id, matchId) })
+  const match = await getMatch(matchId)
   if (!match)
     return { type: "ERROR", message: "Match not found" }
 

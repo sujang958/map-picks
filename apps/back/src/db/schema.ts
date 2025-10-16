@@ -1,50 +1,66 @@
 import { JSONMatchMapPicks } from '@self/core';
 import { relations, sql } from 'drizzle-orm';
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { uuid } from 'drizzle-orm/pg-core';
+import { json } from 'drizzle-orm/pg-core';
+import { integer } from 'drizzle-orm/pg-core';
+import { serial } from 'drizzle-orm/pg-core';
+import { timestamp } from 'drizzle-orm/pg-core';
+import { varchar } from 'drizzle-orm/pg-core';
+import { text } from 'drizzle-orm/pg-core';
+import { pgTable } from 'drizzle-orm/pg-core';
+// import { integer, pgTable, text } from 'drizzle-orm/sqlite-core';
 
-export const teams = sqliteTable('teams', {
-  id: text('id')
+const createdAtHelper = {
+  createdAt: timestamp().defaultNow().notNull(),
+}
+
+export const teams = pgTable('teams', {
+  id: uuid()
     .primaryKey()
-    .notNull()
-    .default(sql`(lower(hex(randomblob(8))))`),
-
-  name: text('name', { length: 32 }).notNull(),
-
-  createdAt: text('created_at')
-    .default(sql`(CURRENT_TIMESTAMP)`)
+    .defaultRandom()
     .notNull(),
+
+
+  name: varchar('name', { length: 32 }).unique().notNull(),
+
+  ...createdAtHelper,
 });
 
-export const matches = sqliteTable('matches', {
-  id: text('id')
+export const matches = pgTable('matches', {
+  id: uuid()
+    .defaultRandom()
     .primaryKey()
     .notNull()
-    .default(sql`(lower(hex(randomblob(16))))`),
+  ,
 
   mapPoolId: integer('map_pool_id').notNull(),
-  mapPicks: text('map_picks', { mode: "json" }).$type<JSONMatchMapPicks>().notNull(),
+  mapPicks: json().$type<JSONMatchMapPicks>().default({
+    version: "1.0",
+    t1Id: "",
+    t2Id: "",
+    mapPool: [],
+    bestOf: 3,
+    t1Veto: [],
+    t1Select: [],
+    t2Veto: [],
+    t2Select: [],
+    turn: 0,
+  }).notNull(),
 
-  t1Id: text('t1_id')
+  t1Id: uuid('t1_id')
     .notNull(),
-  t2Id: text('t2_id')
+  t2Id: uuid('t2_id')
     .notNull(),
 
   // bestOf: integer('best_of').notNull(), // 1, 3, 5
 
-  createdAt: text('created_at')
-    .default(sql`(CURRENT_TIMESTAMP)`)
-    .notNull(),
+  ...createdAtHelper,
 });
 
-export const mapPools = sqliteTable('mapPools', {
-  id: integer('id').primaryKey(),
-  maps: text('maps', { mode: 'json' })
-    .notNull()
-    .$type<string[]>()
-    .default(sql`(json_array())`),
-  createdAt: text('created_at')
-    .default(sql`(CURRENT_TIMESTAMP)`)
-    .notNull(),
+export const mapPools = pgTable('mapPools', {
+  id: serial('id').primaryKey(),
+  maps: json().$type<string[]>().default([]).notNull(),
+  ...createdAtHelper,
 });
 
 export const teamsRelations = relations(teams, ({ many }) => ({
