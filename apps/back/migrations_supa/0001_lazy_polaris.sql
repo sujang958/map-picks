@@ -1,0 +1,1 @@
+ALTER TABLE "matches" ALTER COLUMN "mapPicks" SET DEFAULT '{"version":"1.0","t1Id":"","t2Id":"","mapPool":[],"bestOf":3,"t1Veto":[],"t1Select":[],"t2Veto":[],"t2Select":[],"turn":0}'::json;
