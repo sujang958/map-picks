@@ -4,9 +4,11 @@ import { db } from "../db"
 import { eq } from "drizzle-orm"
 import { matches } from "../db/schema"
 import { MatchMapPicks } from "@self/core"
+import { getMatch, updateMatchMapPicks } from "../db/utils"
 
 const DecisionMade = async ({ matchId, teamId, decision }: { teamId: string, decision: Decision, matchId: string }): Promise<WSResponse> => {
-  const match = await db.query.matches.findFirst({ where: eq(matches.id, matchId), with: { mapPool: true, t1: true, t2: true } })
+  // const match = await db.query.matches.findFirst({ where: eq(matches.id, matchId), with: { mapPool: true, t1: true, t2: true } })
+  const match = await getMatch(matchId)
 
   if (!match)
     return { type: "ERROR", message: "Match not found" }
@@ -31,7 +33,8 @@ const DecisionMade = async ({ matchId, teamId, decision }: { teamId: string, dec
     return { type: "ERROR", message: "Invalid decision" }
 
   const changed = matchMapPicks.toJSON()
-  await db.update(matches).set({ mapPicks: changed }).where(eq(matches.id, matchId))
+
+  await updateMatchMapPicks(matchId, changed)
 
   return { type: "MATCH.NEW_STATE", payload: { ...changed, canParticipate: true } }
 }
