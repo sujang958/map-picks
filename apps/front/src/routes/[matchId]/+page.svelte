@@ -50,6 +50,7 @@
 	let player = $derived.by(() => ({
 		side: matchState?.canParticipate ? (matchState.amIT1 ? ('t1' as const) : ('t2' as const)) : null
 	}));
+	let isMyTurn = $derived((player?.side ?? 't1') == 't1' && MapPicks?.isT1Turn);
 
 	onMount(() => {
 		const ws = new WebSocket(`ws://localhost:3000/ws/${params.matchId}`);
@@ -96,8 +97,13 @@
 		</div>
 
 		{#if matchState}
-			<div class="mt-16 flex w-full flex-row justify-between gap-x-16">
-				<div class="w-3/4">
+			<div class="mt-16 flex w-full select-none flex-row justify-between gap-x-16">
+				<!-- Left, my -->
+				<div
+					class="w-3/4 {!isMyTurn
+						? 'grayscale-100 pointer-events-none cursor-none opacity-40'
+						: ''}"
+				>
 					<header class="text-left">
 						<p class="flex flex-row items-center gap-x-2 text-xl font-semibold">
 							{matchState[player.side ?? 't1'].name}
@@ -166,14 +172,16 @@
 							</footer>
 						</div>{/if}
 				</div>
-				<div class="rayscale-100 w-1/4 opacity-40">
+
+				<!-- Right, opponent -->
+				<div class={isMyTurn ? 'grayscale-100 pointer-events-none cursor-none opacity-40' : ''}>
 					<header class="text-right">
 						<p class="flex flex-row items-center justify-end gap-x-2 text-xl font-semibold">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								viewBox="0 0 24 24"
 								fill="currentColor"
-								class="size-3 fill-neutral-800"
+								class="size-3 fill-red-800"
 							>
 								<path
 									d="M5.055 7.06C3.805 6.347 2.25 7.25 2.25 8.69v8.122c0 1.44 1.555 2.343 2.805 1.628L12 14.471v2.34c0 1.44 1.555 2.343 2.805 1.628l7.108-4.061c1.26-.72 1.26-2.536 0-3.256l-7.108-4.061C13.555 6.346 12 7.249 12 8.689v2.34L5.055 7.061Z"
