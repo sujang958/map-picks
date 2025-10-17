@@ -67,7 +67,7 @@
 </script>
 
 <div class="grid h-screen w-full place-items-center">
-	<main class="h-full w-full max-w-4xl rounded-lg p-3 py-24">
+	<main class="h-full w-full max-w-5xl rounded-lg px-8 py-16">
 		<h1 class="text-3xl font-semibold">Bo3 Map Picks</h1>
 		<h1 class="mt-2 text-base text-neutral-500">Time Limit 10:00</h1>
 		<div class="mt-8 grid grid-cols-7">
@@ -80,11 +80,11 @@
 			<MapPick team="" type="Remainder" enemyTeam="T1" />
 		</div>
 
-		<div class="mt-16 flex flex-row justify-between gap-x-16">
-			<div class="flex-1 bg-neutral-100">
+		<div class="mt-16 flex w-full flex-row justify-between gap-x-16">
+			<div class=" grayscale-75 w-3/4 opacity-30">
 				<header class="text-left">
 					<p class="flex flex-row items-center gap-x-2 text-xl font-semibold">
-						T1(You) <svg
+						25/2-5 (You) <svg
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 24 24"
 							fill="currentColor"
@@ -95,21 +95,32 @@
 							/>
 						</svg>
 					</p>
-					<p class="mt-1 text-sm text-neutral-500">Choosing a map...</p>
+					<p class="mt-1 text-sm text-neutral-500">T1 Choosing a map...</p>
 				</header>
-				<main class="mt-3">
-					<div class="grid gap-1">
+				<main class="mt-8">
+					<!-- grid w-full auto-cols-auto grid-flow-col  -->
+					<div class="flex flex-row flex-wrap items-center gap-2">
 						{#each Object.entries(MAPS) as [key, { name, image }] (key)}
-							<div>
-								<img src={image} alt={name} />
+							<div class="w-24 cursor-pointer rounded-lg hover:ring-2 hover:ring-blue-500">
+								<img src={image} alt={name} class="size-24 object-cover" draggable="false" />
+								<p class="mt-0.5 py-0.5 text-sm font-medium">{name}</p>
 							</div>
 						{/each}
 					</div>
 				</main>
+				<footer class="mt-8">
+					<div class="flex flex-row items-center justify-end gap-x-3">
+						<button
+							type="button"
+							class="cursor-pointer rounded-lg bg-red-200 px-4 py-1.5 font-medium text-red-800"
+							>Lock In</button
+						>
+					</div>
+				</footer>
 			</div>
-			<div class="">
+			<div class="w-1/4">
 				<header class="text-right opacity-50">
-					<p class="flex flex-row items-center gap-x-2 text-xl font-semibold">
+					<p class="flex flex-row items-center justify-end gap-x-2 text-xl font-semibold">
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 24 24"
