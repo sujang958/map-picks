@@ -41,13 +41,14 @@
 	};
 	// TODO: get this from servers
 
-	let matchState = $state.raw<Extract<WSResponse, { type: 'MATCH.NEW_STATE' }> | null>(null);
-	let MapPicks = $derived.by(() =>
-		matchState?.payload ? MatchMapPicks.fromJson(matchState.payload.mapPicks) : null
+	let matchState = $state.raw<Extract<WSResponse, { type: 'MATCH.NEW_STATE' }>['payload'] | null>(
+		null
 	);
-
+	let MapPicks = $derived.by(() =>
+		matchState ? MatchMapPicks.fromJson(matchState.mapPicks) : null
+	);
 	let player = $derived.by(() => ({
-		side: matchState?.payload.canParticipate ? (matchState.payload.amIT1 ? 'T1' : 'T2') : null
+		side: matchState?.canParticipate ? (matchState.amIT1 ? ('t1' as const) : ('t2' as const)) : null
 	}));
 
 	onMount(() => {
@@ -71,7 +72,7 @@
 			// }
 			if (!typia.is<WSResponse>(res)) return;
 
-			if (res.type === 'MATCH.NEW_STATE') matchState = { ...res };
+			if (res.type === 'MATCH.NEW_STATE') matchState = { ...res.payload };
 		};
 	});
 
@@ -94,92 +95,94 @@
 			<MapPick team="" type="Remainder" enemyTeam="T1" />
 		</div>
 
-		<div class="mt-16 flex w-full flex-row justify-between gap-x-16">
-			<div class="w-3/4">
-				<header class="text-left">
-					<p class="flex flex-row items-center gap-x-2 text-xl font-semibold">
-						{matchState?.payload.t1.name} (You)
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 24 24"
-							fill="currentColor"
-							class="size-3 fill-red-800"
-						>
-							<path
-								d="M9.195 18.44c1.25.714 2.805-.189 2.805-1.629v-2.34l6.945 3.968c1.25.715 2.805-.188 2.805-1.628V8.69c0-1.44-1.555-2.343-2.805-1.628L12 11.029v-2.34c0-1.44-1.555-2.343-2.805-1.628l-7.108 4.061c-1.26.72-1.26 2.536 0 3.256l7.108 4.061Z"
-							/>
-						</svg>
-					</p>
-					<p class="mt-1 text-sm text-neutral-500">T1 Choosing a map...</p>
-				</header>
-				{#if !player.side}
-					<div>
-						<main class="mt-8">
-							<p class="text-base font-medium">Pick a Map to Veto / Select</p>
-							<!-- grid w-full auto-cols-auto grid-flow-col  -->
-							<div class="mt-4 flex flex-row flex-wrap items-center gap-2">
-								{#each Object.entries(MAPS) as [key, { name, image }] (key)}
-									<div class="w-24 cursor-pointer rounded-lg hover:ring-2 hover:ring-blue-500">
-										<img src={image} alt={name} class="size-24 object-cover" draggable="false" />
-										<p class="mt-0.5 py-0.5 text-sm font-normal text-neutral-500">{name}</p>
-									</div>
-								{/each}
-							</div>
-						</main>
-						<footer class="mt-8">
-							<div class="flex flex-row items-center justify-end gap-x-3">
-								<button
-									type="button"
-									class="cursor-pointer rounded-lg bg-red-200 px-4 py-1.5 font-medium text-red-800"
-									>Lock In</button
-								>
-							</div>
-						</footer>
-					</div>
-					<div class="grayscale-100 opacity-40">
-						<main class="mt-8">
-							<p class="text-base font-semibold">Pick a Side for Ascent</p>
-							<div class="mt-4 flex flex-row items-center gap-x-3">
-								<button
-									type="button"
-									class="cursor-pointer rounded-lg bg-red-200 px-4 py-1 text-sm text-red-900"
-									>Attack</button
-								>
-								<button
-									type="button"
-									class="cursor-pointer rounded-lg bg-blue-200 px-4 py-1 text-sm text-blue-900"
-									>Defense</button
-								>
-							</div>
-						</main>
-						<footer class="mt-8">
-							<div class="flex flex-row items-center justify-end gap-x-3">
-								<button
-									type="button"
-									class="cursor-pointer rounded-lg bg-red-200 px-4 py-1.5 font-medium text-red-800"
-									>Lock In</button
-								>
-							</div>
-						</footer>
-					</div>{/if}
-			</div>
-			<div class="rayscale-100 w-1/4 opacity-40">
-				<header class="text-right">
-					<p class="flex flex-row items-center justify-end gap-x-2 text-xl font-semibold">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 24 24"
-							fill="currentColor"
-							class="size-3 fill-neutral-800"
-						>
-							<path
-								d="M5.055 7.06C3.805 6.347 2.25 7.25 2.25 8.69v8.122c0 1.44 1.555 2.343 2.805 1.628L12 14.471v2.34c0 1.44 1.555 2.343 2.805 1.628l7.108-4.061c1.26-.72 1.26-2.536 0-3.256l-7.108-4.061C13.555 6.346 12 7.249 12 8.689v2.34L5.055 7.061Z"
-							/>
-						</svg> T2
-					</p>
-					<p class="mt-1 text-sm text-neutral-500">Waiting...</p>
-				</header>
-			</div>
-		</div>
+		{#if matchState}
+			<div class="mt-16 flex w-full flex-row justify-between gap-x-16">
+				<div class="w-3/4">
+					<header class="text-left">
+						<p class="flex flex-row items-center gap-x-2 text-xl font-semibold">
+							{matchState[player.side ?? 't1'].name}
+							{player?.side ? '(You)' : ''}
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 24 24"
+								fill="currentColor"
+								class="size-3 fill-red-800"
+							>
+								<path
+									d="M9.195 18.44c1.25.714 2.805-.189 2.805-1.629v-2.34l6.945 3.968c1.25.715 2.805-.188 2.805-1.628V8.69c0-1.44-1.555-2.343-2.805-1.628L12 11.029v-2.34c0-1.44-1.555-2.343-2.805-1.628l-7.108 4.061c-1.26.72-1.26 2.536 0 3.256l7.108 4.061Z"
+								/>
+							</svg>
+						</p>
+						<p class="mt-1 text-sm text-neutral-500">{player?.side ?? 't2'}, Choosing a map...</p>
+					</header>
+					{#if matchState.canParticipate && player.side}
+						<div>
+							<main class="mt-8">
+								<p class="text-base font-medium">Pick a Map to Veto / Select</p>
+								<!-- grid w-full auto-cols-auto grid-flow-col  -->
+								<div class="mt-4 flex flex-row flex-wrap items-center gap-2">
+									{#each Object.entries(MAPS) as [key, { name, image }] (key)}
+										<div class="w-24 cursor-pointer rounded-lg hover:ring-2 hover:ring-blue-500">
+											<img src={image} alt={name} class="size-24 object-cover" draggable="false" />
+											<p class="mt-0.5 py-0.5 text-sm font-normal text-neutral-500">{name}</p>
+										</div>
+									{/each}
+								</div>
+							</main>
+							<footer class="mt-8">
+								<div class="flex flex-row items-center justify-end gap-x-3">
+									<button
+										type="button"
+										class="cursor-pointer rounded-lg bg-red-200 px-4 py-1.5 font-medium text-red-800"
+										>Lock In</button
+									>
+								</div>
+							</footer>
+						</div>
+						<div class="grayscale-100 opacity-40">
+							<main class="mt-8">
+								<p class="text-base font-semibold">Pick a Side for Ascent</p>
+								<div class="mt-4 flex flex-row items-center gap-x-3">
+									<button
+										type="button"
+										class="cursor-pointer rounded-lg bg-red-200 px-4 py-1 text-sm text-red-900"
+										>Attack</button
+									>
+									<button
+										type="button"
+										class="cursor-pointer rounded-lg bg-blue-200 px-4 py-1 text-sm text-blue-900"
+										>Defense</button
+									>
+								</div>
+							</main>
+							<footer class="mt-8">
+								<div class="flex flex-row items-center justify-end gap-x-3">
+									<button
+										type="button"
+										class="cursor-pointer rounded-lg bg-red-200 px-4 py-1.5 font-medium text-red-800"
+										>Lock In</button
+									>
+								</div>
+							</footer>
+						</div>{/if}
+				</div>
+				<div class="rayscale-100 w-1/4 opacity-40">
+					<header class="text-right">
+						<p class="flex flex-row items-center justify-end gap-x-2 text-xl font-semibold">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 24 24"
+								fill="currentColor"
+								class="size-3 fill-neutral-800"
+							>
+								<path
+									d="M5.055 7.06C3.805 6.347 2.25 7.25 2.25 8.69v8.122c0 1.44 1.555 2.343 2.805 1.628L12 14.471v2.34c0 1.44 1.555 2.343 2.805 1.628l7.108-4.061c1.26-.72 1.26-2.536 0-3.256l-7.108-4.061C13.555 6.346 12 7.249 12 8.689v2.34L5.055 7.061Z"
+								/>
+							</svg> T2
+						</p>
+						<p class="mt-1 text-sm text-neutral-500">Waiting...</p>
+					</header>
+				</div>
+			</div>{/if}
 	</main>
 </div>
