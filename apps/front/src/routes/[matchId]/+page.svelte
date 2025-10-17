@@ -81,7 +81,7 @@
 		</div>
 
 		<div class="mt-16 flex w-full flex-row justify-between gap-x-16">
-			<div class=" grayscale-75 w-3/4 opacity-30">
+			<div class="w-3/4">
 				<header class="text-left">
 					<p class="flex flex-row items-center gap-x-2 text-xl font-semibold">
 						25/2-5 (You) <svg
@@ -97,29 +97,58 @@
 					</p>
 					<p class="mt-1 text-sm text-neutral-500">T1 Choosing a map...</p>
 				</header>
-				<main class="mt-8">
-					<!-- grid w-full auto-cols-auto grid-flow-col  -->
-					<div class="flex flex-row flex-wrap items-center gap-2">
-						{#each Object.entries(MAPS) as [key, { name, image }] (key)}
-							<div class="w-24 cursor-pointer rounded-lg hover:ring-2 hover:ring-blue-500">
-								<img src={image} alt={name} class="size-24 object-cover" draggable="false" />
-								<p class="mt-0.5 py-0.5 text-sm font-medium">{name}</p>
-							</div>
-						{/each}
-					</div>
-				</main>
-				<footer class="mt-8">
-					<div class="flex flex-row items-center justify-end gap-x-3">
-						<button
-							type="button"
-							class="cursor-pointer rounded-lg bg-red-200 px-4 py-1.5 font-medium text-red-800"
-							>Lock In</button
-						>
-					</div>
-				</footer>
+				<div>
+					<main class="mt-8">
+						<p class="text-base font-medium">Pick a Map to Veto / Select</p>
+						<!-- grid w-full auto-cols-auto grid-flow-col  -->
+						<div class="flex flex-row flex-wrap items-center gap-2 mt-4">
+							{#each Object.entries(MAPS) as [key, { name, image }] (key)}
+								<div class="w-24 cursor-pointer rounded-lg hover:ring-2 hover:ring-blue-500">
+									<img src={image} alt={name} class="size-24 object-cover" draggable="false" />
+									<p class="mt-0.5 py-0.5 text-sm font-normal text-neutral-500">{name}</p>
+								</div>
+							{/each}
+						</div>
+					</main>
+					<footer class="mt-8">
+						<div class="flex flex-row items-center justify-end gap-x-3">
+							<button
+								type="button"
+								class="cursor-pointer rounded-lg bg-red-200 px-4 py-1.5 font-medium text-red-800"
+								>Lock In</button
+							>
+						</div>
+					</footer>
+				</div>
+				<div class="grayscale-100 opacity-40">
+					<main class="mt-8">
+						<p class="text-base font-semibold">Pick a Side for Ascent</p>
+						<div class="mt-4 flex flex-row items-center gap-x-3">
+							<button
+								type="button"
+								class="cursor-pointer rounded-lg bg-red-200 px-4 py-1 text-sm text-red-900"
+								>Attack</button
+							>
+							<button
+								type="button"
+								class="cursor-pointer rounded-lg bg-blue-200 px-4 py-1 text-sm text-blue-900"
+								>Defense</button
+							>
+						</div>
+					</main>
+					<footer class="mt-8">
+						<div class="flex flex-row items-center justify-end gap-x-3">
+							<button
+								type="button"
+								class="cursor-pointer rounded-lg bg-red-200 px-4 py-1.5 font-medium text-red-800"
+								>Lock In</button
+							>
+						</div>
+					</footer>
+				</div>
 			</div>
-			<div class="w-1/4">
-				<header class="text-right opacity-50">
+			<div class="rayscale-100 w-1/4 opacity-40">
+				<header class="text-right">
 					<p class="flex flex-row items-center justify-end gap-x-2 text-xl font-semibold">
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
