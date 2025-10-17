@@ -8,7 +8,6 @@ import typia from "typia";
 import ErrorResponse from "./ws/Error";
 import DecisionMade from "./ws/DecisionMade";
 import Open from "./ws/Open";
-import { MatchMapPicks } from "@self/core";
 
 const app = new Elysia()
   .use(jwt({ name: "jwt", secret: process.env.JWT_SECRET! }))
@@ -35,20 +34,22 @@ const app = new Elysia()
   })
   .ws("/ws/:matchId", {
     async open(ws) {
-      console.log(new MatchMapPicks({
-        bestOf: 3, mapPool: [
-          "Lotus",
-          "Ascent",
-          "Pearl",
-          "Bind",
-          "Haven",
-          "Sunset",
-          "Abyss"
-        ], t1Id: "9fc0204fdbe4cd04", t2Id: "654fa6869711c496",
-      }).toJSON())
+      // console.log(new MatchMapPicks({
+      //   bestOf: 3, mapPool: [
+      //     "Lotus",
+      //     "Ascent",
+      //     "Pearl",
+      //     "Bind",
+      //     "Haven",
+      //     "Sunset",
+      //     "Abyss"
+      //   ], t1Id: "9fc0204fdbe4cd04", t2Id: "654fa6869711c496",
+      // }).toJSON())
 
       const matchId = ws.data.params.matchId
       const team = await ws.data.jwt.verify(ws.data.cookie.auth.value as string)
+
+      console.log(team, matchId)
 
       ws.send(JSON.stringify(await Open({ matchId, teamId: team ? team.id : undefined })))
     },
@@ -58,6 +59,8 @@ const app = new Elysia()
       const team = await ws.data.jwt.verify(ws.data.cookie.auth.value as string)
 
       if (!team) return
+
+      console.log(team, matchId)
 
       const request = typia.assert<WSRequest>(JSON.parse(String(message)))
       if (request.type == "MATCH.DECISION_MADE")

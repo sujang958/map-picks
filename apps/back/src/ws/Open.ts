@@ -5,7 +5,8 @@ import { matches } from "../db/schema";
 import { getMatch } from "../db/utils";
 
 const Open: WSHandler = async ({ matchId, teamId }: { matchId: string, teamId?: string }) => {
-  const match = await getMatch(matchId)
+  const match = await getMatch(matchId) // TODO: add try catch
+
   if (!match)
     return { type: "ERROR", message: "Match not found" }
 
