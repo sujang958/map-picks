@@ -36,7 +36,9 @@ const DecisionMade = async ({ matchId, teamId, decision }: { teamId: string, dec
 
   await updateMatchMapPicks(matchId, changed)
 
-  return { type: "MATCH.NEW_STATE", payload: { ...changed, canParticipate: true } }
+  const newMatch = (await getMatch(matchId))!
+
+  return { type: "MATCH.NEW_STATE", payload: { ...newMatch, canParticipate: true, amIT1: match.t1Id == teamId ? true : false } }
 }
 
 export default DecisionMade

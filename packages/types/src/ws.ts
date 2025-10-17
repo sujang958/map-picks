@@ -4,10 +4,35 @@ import type { JSONMatchMapPicks, Side } from "@self/core"
 
 export type WSResponse = {
   type: "MATCH.NEW_STATE"
-  payload: JSONMatchMapPicks & { canParticipate: boolean }  // TODO: just copy from backend
+  payload: {
+    id: string;
+    createdAt: Date;
+    mapPoolId: number;
+    t1Id: string;
+    t2Id: string;
+    mapPicks: JSONMatchMapPicks;
+    mapPool: {
+      id: number;
+      createdAt: Date;
+      maps: string[];
+    };
+    t1: {
+      name: string;
+      id: string;
+      createdAt: Date;
+    };
+    t2: {
+      name: string;
+      id: string;
+      createdAt: Date;
+    }
+
+
+    canParticipate: boolean, amIT1: boolean
+  }  // TODO: just copy from backend
 } | { type: "ERROR", message: string }
 
-// type a = Pick<WSResponse, { type: "ERROR" }> // TODO: how to do this shit bruh
+// JSONMatchMapPicks & { canParticipate: boolean, amIT1: boolean }  // TODO: just copy from backend
 
 export type Decision = ({
   decision: string

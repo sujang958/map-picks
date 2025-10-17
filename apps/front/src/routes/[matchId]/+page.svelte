@@ -5,6 +5,7 @@
 	import typia from 'typia';
 	import type { WSResponse } from '@self/types/ws';
 	import { MatchMapPicks, type JSONMatchMapPicks } from '@self/core';
+	import SuperJSON from 'superjson';
 
 	let { params }: PageProps = $props();
 
@@ -40,8 +41,14 @@
 	};
 	// TODO: get this from servers
 
-	let matchMapPicks: JSONMatchMapPicks | null = $state(null); // class or object? MatchMapPicks vs JSONMatchMapPicks
-	let canParticipate = $state(false);
+	let matchState = $state.raw<Extract<WSResponse, { type: 'MATCH.NEW_STATE' }> | null>(null);
+	let MapPicks = $derived.by(() =>
+		matchState?.payload ? MatchMapPicks.fromJson(matchState.payload.mapPicks) : null
+	);
+
+	let player = $derived.by(() => ({
+		side: matchState?.payload.canParticipate ? (matchState.payload.amIT1 ? 'T1' : 'T2') : null
+	}));
 
 	onMount(() => {
 		const ws = new WebSocket(`ws://localhost:3000/ws/${params.matchId}`);
@@ -52,18 +59,24 @@
 		};
 
 		ws.onmessage = (event) => {
-			console.log("HELLOO????????????????????")
 			console.log('Message from server:', event.data);
 
-			const res = JSON.parse(event.data);
+			const res = SuperJSON.parse(event.data);
 
+			// console.log(res);
+			// try {
+			// 	typia.assert<WSResponse>(res);
+			// } catch (e) {
+			// 	console.log(e);
+			// }
 			if (!typia.is<WSResponse>(res)) return;
 
-			if (res.type === 'MATCH.NEW_STATE') {
-				matchMapPicks = res.payload;
-				canParticipate = res.payload.canParticipate;
-			}
+			if (res.type === 'MATCH.NEW_STATE') matchState = { ...res };
 		};
+	});
+
+	$effect(() => {
+		console.log('MatchState Change', matchState);
 	});
 </script>
 
@@ -85,7 +98,8 @@
 			<div class="w-3/4">
 				<header class="text-left">
 					<p class="flex flex-row items-center gap-x-2 text-xl font-semibold">
-						25/2-5 (You) <svg
+						{matchState?.payload.t1.name} (You)
+						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 24 24"
 							fill="currentColor"
@@ -98,55 +112,56 @@
 					</p>
 					<p class="mt-1 text-sm text-neutral-500">T1 Choosing a map...</p>
 				</header>
-				<div>
-					<main class="mt-8">
-						<p class="text-base font-medium">Pick a Map to Veto / Select</p>
-						<!-- grid w-full auto-cols-auto grid-flow-col  -->
-						<div class="flex flex-row flex-wrap items-center gap-2 mt-4">
-							{#each Object.entries(MAPS) as [key, { name, image }] (key)}
-								<div class="w-24 cursor-pointer rounded-lg hover:ring-2 hover:ring-blue-500">
-									<img src={image} alt={name} class="size-24 object-cover" draggable="false" />
-									<p class="mt-0.5 py-0.5 text-sm font-normal text-neutral-500">{name}</p>
-								</div>
-							{/each}
-						</div>
-					</main>
-					<footer class="mt-8">
-						<div class="flex flex-row items-center justify-end gap-x-3">
-							<button
-								type="button"
-								class="cursor-pointer rounded-lg bg-red-200 px-4 py-1.5 font-medium text-red-800"
-								>Lock In</button
-							>
-						</div>
-					</footer>
-				</div>
-				<div class="grayscale-100 opacity-40">
-					<main class="mt-8">
-						<p class="text-base font-semibold">Pick a Side for Ascent</p>
-						<div class="mt-4 flex flex-row items-center gap-x-3">
-							<button
-								type="button"
-								class="cursor-pointer rounded-lg bg-red-200 px-4 py-1 text-sm text-red-900"
-								>Attack</button
-							>
-							<button
-								type="button"
-								class="cursor-pointer rounded-lg bg-blue-200 px-4 py-1 text-sm text-blue-900"
-								>Defense</button
-							>
-						</div>
-					</main>
-					<footer class="mt-8">
-						<div class="flex flex-row items-center justify-end gap-x-3">
-							<button
-								type="button"
-								class="cursor-pointer rounded-lg bg-red-200 px-4 py-1.5 font-medium text-red-800"
-								>Lock In</button
-							>
-						</div>
-					</footer>
-				</div>
+				{#if !player.side}
+					<div>
+						<main class="mt-8">
+							<p class="text-base font-medium">Pick a Map to Veto / Select</p>
+							<!-- grid w-full auto-cols-auto grid-flow-col  -->
+							<div class="mt-4 flex flex-row flex-wrap items-center gap-2">
+								{#each Object.entries(MAPS) as [key, { name, image }] (key)}
+									<div class="w-24 cursor-pointer rounded-lg hover:ring-2 hover:ring-blue-500">
+										<img src={image} alt={name} class="size-24 object-cover" draggable="false" />
+										<p class="mt-0.5 py-0.5 text-sm font-normal text-neutral-500">{name}</p>
+									</div>
+								{/each}
+							</div>
+						</main>
+						<footer class="mt-8">
+							<div class="flex flex-row items-center justify-end gap-x-3">
+								<button
+									type="button"
+									class="cursor-pointer rounded-lg bg-red-200 px-4 py-1.5 font-medium text-red-800"
+									>Lock In</button
+								>
+							</div>
+						</footer>
+					</div>
+					<div class="grayscale-100 opacity-40">
+						<main class="mt-8">
+							<p class="text-base font-semibold">Pick a Side for Ascent</p>
+							<div class="mt-4 flex flex-row items-center gap-x-3">
+								<button
+									type="button"
+									class="cursor-pointer rounded-lg bg-red-200 px-4 py-1 text-sm text-red-900"
+									>Attack</button
+								>
+								<button
+									type="button"
+									class="cursor-pointer rounded-lg bg-blue-200 px-4 py-1 text-sm text-blue-900"
+									>Defense</button
+								>
+							</div>
+						</main>
+						<footer class="mt-8">
+							<div class="flex flex-row items-center justify-end gap-x-3">
+								<button
+									type="button"
+									class="cursor-pointer rounded-lg bg-red-200 px-4 py-1.5 font-medium text-red-800"
+									>Lock In</button
+								>
+							</div>
+						</footer>
+					</div>{/if}
 			</div>
 			<div class="rayscale-100 w-1/4 opacity-40">
 				<header class="text-right">

@@ -8,6 +8,7 @@ import typia from "typia";
 import ErrorResponse from "./ws/Error";
 import DecisionMade from "./ws/DecisionMade";
 import Open from "./ws/Open";
+import SuperJSON from "superjson";
 
 const app = new Elysia()
   .use(jwt({ name: "jwt", secret: process.env.JWT_SECRET! }))
@@ -51,7 +52,7 @@ const app = new Elysia()
 
       console.log(team, matchId)
 
-      ws.send(JSON.stringify(await Open({ matchId, teamId: team ? team.id : undefined })))
+      ws.send(SuperJSON.stringify(await Open({ matchId, teamId: team ? team.id : undefined })))
     },
     async close(ws) { },
     async message(ws, message) {
@@ -64,7 +65,7 @@ const app = new Elysia()
 
       const request = typia.assert<WSRequest>(JSON.parse(String(message)))
       if (request.type == "MATCH.DECISION_MADE")
-        return ws.send(JSON.stringify(DecisionMade({ teamId: team.id as string, decision: request.payload, matchId })))
+        return ws.send(SuperJSON.stringify(DecisionMade({ teamId: team.id as string, decision: request.payload, matchId })))
     },
   })
 
