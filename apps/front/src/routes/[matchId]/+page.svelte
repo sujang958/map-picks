@@ -8,6 +8,38 @@
 
 	let { params }: PageProps = $props();
 
+	const MAPS = {
+		abyss: {
+			name: 'Abyss',
+			image: '/maps/abyss.webp'
+		},
+		ascent: {
+			name: 'Ascent',
+			image: '/maps/ascent.jpg'
+		},
+		bind: {
+			name: 'Bind',
+			image: '/maps/bind.png'
+		},
+		haven: {
+			name: 'Haven',
+			image: '/maps/haven.webp'
+		},
+		lotus: {
+			name: 'Lotus',
+			image: '/maps/lotus.webp'
+		},
+		pearl: {
+			name: 'Pearl',
+			image: '/maps/pearl.jpg'
+		},
+		sunset: {
+			name: 'Sunset',
+			image: '/maps/sunset.png'
+		}
+	};
+	// TODO: get this from servers
+
 	let matchMapPicks: JSONMatchMapPicks | null = $state(null); // class or object? MatchMapPicks vs JSONMatchMapPicks
 	let canParticipate = $state(false);
 
@@ -48,8 +80,8 @@
 			<MapPick team="" type="Remainder" enemyTeam="T1" />
 		</div>
 
-		<div class="mt-16 flex flex-row justify-between gap-x-3">
-			<div>
+		<div class="mt-16 flex flex-row justify-between gap-x-16">
+			<div class="flex-1 bg-neutral-100">
 				<header class="text-left">
 					<p class="flex flex-row items-center gap-x-2 text-xl font-semibold">
 						T1(You) <svg
@@ -65,8 +97,17 @@
 					</p>
 					<p class="mt-1 text-sm text-neutral-500">Choosing a map...</p>
 				</header>
+				<main class="mt-3">
+					<div class="grid gap-1">
+						{#each Object.entries(MAPS) as [key, { name, image }] (key)}
+							<div>
+								<img src={image} alt={name} />
+							</div>
+						{/each}
+					</div>
+				</main>
 			</div>
-			<div>
+			<div class="">
 				<header class="text-right opacity-50">
 					<p class="flex flex-row items-center gap-x-2 text-xl font-semibold">
 						<svg
