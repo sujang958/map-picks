@@ -9,6 +9,7 @@ import ErrorResponse from "./ws/Error";
 import DecisionMade from "./ws/DecisionMade";
 import Open from "./ws/Open";
 import SuperJSON from "superjson";
+import { getMatch } from "./db/utils";
 
 const app = new Elysia()
   .use(jwt({ name: "jwt", secret: process.env.JWT_SECRET! }))
@@ -52,9 +53,33 @@ const app = new Elysia()
 
       console.log(team, matchId)
 
+
+      if (team && team.id) {
+        const match = await getMatch(matchId)
+
+        if (!match) return
+
+        if (match.t1Id == team.id)
+          ws.send(SuperJSON.stringify({
+            type: "MATCH.PARTICIPATE", payload: {
+              canParticipate: true, amIT1: true
+            }
+          } satisfies WSResponse))
+        else if (match.t2Id == team.id)
+          ws.send(SuperJSON.stringify({
+            type: "MATCH.PARTICIPATE", payload: {
+              canParticipate: true, amIT1: false
+            }
+          } satisfies WSResponse))
+      }
+
+      ws.subscribe(`MATCH:${matchId}`)
+
       ws.send(SuperJSON.stringify(await Open({ matchId, teamId: team ? team.id : undefined })))
     },
-    async close(ws) { },
+    async close(ws) {
+      ws.unsubscribe(`MATCH:${ws.data.params.matchId}`)
+    },
     async message(ws, message) {
       const matchId = ws.data.params.matchId
       const team = await ws.data.jwt.verify(ws.data.cookie.auth.value as string)
@@ -68,8 +93,11 @@ const app = new Elysia()
       try {
         if (!typia.is<WSRequest>(parsed)) return
 
-        if (parsed.type == "MATCH.DECISION_MADE")
-          return ws.send(SuperJSON.stringify(await DecisionMade({ teamId: team.id as string, decision: parsed.payload, matchId })))
+        if (parsed.type == "MATCH.DECISION_MADE") {
+          const res = await DecisionMade({ teamId: team.id as string, decision: parsed.payload, matchId })
+
+          return ws.publish(`MATCH:${matchId}`, SuperJSON.stringify(res))
+        }
       } catch (e) {
         console.log(e)
       }

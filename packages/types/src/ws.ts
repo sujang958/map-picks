@@ -3,6 +3,11 @@ import type { JSONMatchMapPicks, Side } from "@self/core"
 // export type PickByType<T, K> = T extends { type: K } ? T : never;
 
 export type WSResponse = {
+  type: "MATCH.PARTICIPATE", payload: {
+    amIT1: boolean,
+    canParticipate: boolean,
+  }
+} | {
   type: "MATCH.NEW_STATE"
   payload: {
     id: string;
@@ -28,7 +33,7 @@ export type WSResponse = {
     }
 
 
-    canParticipate: boolean, amIT1: boolean
+    // canParticipate: boolean, amIT1: boolean
   }  // TODO: just copy from backend
 } | { type: "ERROR", message: string }
 

@@ -41,24 +41,31 @@
 	};
 	// TODO: get this from servers
 
-	let matchState = $state.raw<Extract<WSResponse, { type: 'MATCH.NEW_STATE' }>['payload'] | null>(
-		null
-	);
+	let matchState = $state<Extract<WSResponse, { type: 'MATCH.NEW_STATE' }>['payload'] | null>(null);
+	let matchParticipation = $state<null | { canParticipate: boolean; amIT1: boolean }>(null);
 	let MapPicks = $derived.by(() =>
 		matchState ? MatchMapPicks.fromJson(matchState.mapPicks) : null
 	);
 	let player = $derived.by(() => ({
-		side: matchState?.canParticipate ? (matchState.amIT1 ? ('t1' as const) : ('t2' as const)) : null
+		side: matchParticipation?.canParticipate
+			? matchParticipation.amIT1
+				? ('t1' as const)
+				: ('t2' as const)
+			: null
 	}));
 	let pov = $derived.by(() =>
-		matchState?.canParticipate && player?.side
-			? { my: player.side, opponent: player.side == 't1' ? ('t2' as const) : ('t1' as const) }
+		matchParticipation?.canParticipate && player?.side
+			? {
+					my: player.side,
+					opponent: player.side == 't1' ? ('t2' as const) : ('t1' as const)
+				}
 			: { my: 't1' as const, opponent: 't2' as const }
 	);
-	let isMyTurn = $derived(
-		((player?.side ?? 't1') == 't1' && MapPicks?.isT1Turn) ||
-			(player?.side == 't2' && !MapPicks?.isT1Turn)
-	);
+	let isMyTurn = $derived(pov.my == 't1' && MapPicks?.isT1Turn);
+	// let isMyTurn = $derived(
+	// 	((player?.side ?? 't1') == 't1' && MapPicks?.isT1Turn) ||
+	// 		(player?.side == 't2' && !MapPicks?.isT1Turn)
+	// );
 
 	let ws: WebSocket;
 
@@ -84,11 +91,12 @@
 			if (!typia.is<WSResponse>(res)) return;
 
 			if (res.type === 'MATCH.NEW_STATE') matchState = { ...res.payload };
+			if (res.type === 'MATCH.PARTICIPATE') matchParticipation = { ...res.payload };
 		};
 	});
 
 	$effect(() => {
-		console.log('MatchState Change', matchState, MapPicks?.isT1Turn, player, isMyTurn);
+		console.log(new Date(), 'MatchState Change', matchState, MapPicks?.isT1Turn, player, isMyTurn);
 	});
 
 	let selectedMap = $state('');
@@ -96,7 +104,7 @@
 	const makeDecision = () => {
 		if (selectedMap.replaceAll(' ', '').length <= 0) return;
 		if (!MapPicks?.timeTo) return;
-		if (!matchState?.canParticipate) return;
+		if (!matchParticipation?.canParticipate) return;
 
 		const { to, who } = MapPicks.timeTo;
 		if (player.side?.toUpperCase() !== who) return;
@@ -121,12 +129,8 @@
 		<h1 class="mt-2 text-base text-neutral-500">Time Limit 10:00</h1>
 		{#if MapPicks}
 			<div class="mt-8 grid grid-cols-7">
-				<MapPick
-					team="T1"
-					active
-					map={MAPS[MapPicks.t1Veto[0].map.toLowerCase() ?? 'sunset'].image}
-				/>
-				<MapPick team="T2" map={MAPS[MapPicks.t2Veto[0].map.toLowerCase() ?? 'sunset'].image} />
+				<MapPick team="T1" active map={MAPS[MapPicks.t1Veto[0]?.map.toLowerCase() ?? '']?.image} />
+				<MapPick team="T2" map={MAPS[MapPicks.t2Veto[0]?.map.toLowerCase() ?? '']?.image} />
 				<MapPick team="T1" type="Select" enemyTeam="T2" />
 				<MapPick team="T2" type="Select" enemyTeam="T1" />
 				<MapPick team="T1" />
@@ -160,7 +164,7 @@
 						</p>
 						<p class="mt-1 text-sm text-neutral-500">{player?.side ?? 't2'}, Choosing a map...</p>
 					</header>
-					{#if matchState.canParticipate && player.side}
+					{#if matchParticipation?.canParticipate && player.side}
 						<div>
 							<main class="mt-8">
 								<p class="text-base font-medium">Pick a Map to Veto / Select</p>
