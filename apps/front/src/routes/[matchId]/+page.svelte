@@ -221,7 +221,7 @@
 						>
 							{#if MapPicks?.timeTo?.to !== 'PICK_SIDE'}
 								<p class="text-base font-medium">
-									Pick a Map to {{ VETO_MAP: 'Veto', SELECT_MAP: 'Select' }[MapPicks.timeTo.to]}
+									Select a Map to {{ VETO_MAP: 'Veto', SELECT_MAP: 'Select' }[MapPicks.timeTo.to]}
 								</p>
 								<!-- grid w-full auto-cols-auto grid-flow-col  -->
 								<div class="mt-4 flex flex-row flex-wrap items-center gap-2">
@@ -249,7 +249,7 @@
 									<button
 										type="button"
 										onclick={() => (selectedDecision = 'ATTACK')}
-										class="cursor-pointer rounded-lg bg-red-200 px-4 py-1 text-sm text-red-900 {selectedDecision ==
+										class="cursor-pointer rounded-lg bg-red-200 px-4 py-1 text-sm text-red-900 transition duration-150 hover:opacity-60 {selectedDecision ==
 										'ATTACK'
 											? 'ring-4 ring-red-900 ring-offset-2'
 											: ''}">Attack</button
@@ -257,7 +257,7 @@
 									<button
 										type="button"
 										onclick={() => (selectedDecision = 'DEFENSE')}
-										class="cursor-pointer rounded-lg bg-blue-200 px-4 py-1 text-sm text-blue-900 {selectedDecision ==
+										class="cursor-pointer rounded-lg bg-blue-200 px-4 py-1 text-sm text-blue-900 transition duration-150 hover:opacity-60 {selectedDecision ==
 										'DEFENSE'
 											? 'ring-4 ring-blue-900 ring-offset-2'
 											: ''}">Defense</button
