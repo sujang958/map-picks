@@ -9,7 +9,7 @@
 
 	let { params }: PageProps = $props();
 
-	const MAPS = {
+	const MAPS: Record<string, { name: string; image: string }> = {
 		abyss: {
 			name: 'Abyss',
 			image: '/maps/abyss.webp'
@@ -50,6 +50,11 @@
 	let player = $derived.by(() => ({
 		side: matchState?.canParticipate ? (matchState.amIT1 ? ('t1' as const) : ('t2' as const)) : null
 	}));
+	let pov = $derived.by(() =>
+		matchState?.canParticipate && player?.side
+			? { my: player.side, opponent: player.side == 't1' ? ('t2' as const) : ('t1' as const) }
+			: { my: 't1' as const, opponent: 't2' as const }
+	);
 	let isMyTurn = $derived(
 		((player?.side ?? 't1') == 't1' && MapPicks?.isT1Turn) ||
 			(player?.side == 't2' && !MapPicks?.isT1Turn)
@@ -114,15 +119,21 @@
 	<main class="h-full w-full max-w-5xl rounded-lg px-8 py-16">
 		<h1 class="text-3xl font-semibold">Bo3 Map Picks</h1>
 		<h1 class="mt-2 text-base text-neutral-500">Time Limit 10:00</h1>
-		<div class="mt-8 grid grid-cols-7">
-			<MapPick team="T1" active />
-			<MapPick team="T2" />
-			<MapPick team="T1" type="Select" enemyTeam="T2" />
-			<MapPick team="T2" type="Select" enemyTeam="T1" />
-			<MapPick team="T1" />
-			<MapPick team="T2" />
-			<MapPick team="" type="Remainder" enemyTeam="T1" />
-		</div>
+		{#if MapPicks}
+			<div class="mt-8 grid grid-cols-7">
+				<MapPick
+					team="T1"
+					active
+					map={MAPS[MapPicks.t1Veto[0].map.toLowerCase() ?? 'sunset'].image}
+				/>
+				<MapPick team="T2" map={MAPS[MapPicks.t2Veto[0].map.toLowerCase() ?? 'sunset'].image} />
+				<MapPick team="T1" type="Select" enemyTeam="T2" />
+				<MapPick team="T2" type="Select" enemyTeam="T1" />
+				<MapPick team="T1" />
+				<MapPick team="T2" />
+				<MapPick team="" type="Remainder" enemyTeam="T1" />
+			</div>
+		{/if}
 
 		{#if matchState}
 			<div class="mt-16 flex w-full select-none flex-row justify-between gap-x-16">
@@ -155,7 +166,9 @@
 								<p class="text-base font-medium">Pick a Map to Veto / Select</p>
 								<!-- grid w-full auto-cols-auto grid-flow-col  -->
 								<div class="mt-4 flex flex-row flex-wrap items-center gap-2">
-									{#each Object.entries(MAPS) as [key, { name, image }] (key)}
+									{#each Object.entries(MAPS).filter((map) => MapPicks?.availableMaps
+											.map((v) => v.toUpperCase())
+											.includes(map[1].name.toUpperCase())) as [key, { name, image }] (key)}
 										<button
 											type="button"
 											class="w-24 cursor-pointer overflow-hidden rounded-lg {selectedMap == name
@@ -221,9 +234,10 @@
 								<path
 									d="M5.055 7.06C3.805 6.347 2.25 7.25 2.25 8.69v8.122c0 1.44 1.555 2.343 2.805 1.628L12 14.471v2.34c0 1.44 1.555 2.343 2.805 1.628l7.108-4.061c1.26-.72 1.26-2.536 0-3.256l-7.108-4.061C13.555 6.346 12 7.249 12 8.689v2.34L5.055 7.061Z"
 								/>
-							</svg> T2
+							</svg>
+							{matchState[pov.opponent].name}
 						</p>
-						<p class="mt-1 text-sm text-neutral-500">Waiting...</p>
+						<p class="mt-1 text-sm text-neutral-500">{pov.opponent}, Waiting...</p>
 					</header>
 				</div>
 			</div>{/if}

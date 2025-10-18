@@ -11,9 +11,8 @@
 	} = $props();
 </script>
 
-<div
-	class={twMerge('relative flex h-44 flex-col gap-y-2 bg-[url(/split.avif)] bg-contain text-white')}
->
+<div class={twMerge(`relative flex h-44 flex-col gap-y-2 bg-[url(${map})] bg-contain text-white`)}>
+	<img src={map} class=" absolute inset-0 h-full object-cover" alt={map} />
 	<p class="z-40 bg-black p-1.5 text-center text-xs font-medium text-white">{team} {type}</p>
 	<!-- <div><img src="/split.avif" alt="" /></div> -->
 	{#if type.toUpperCase() == 'VETO'}
@@ -27,6 +26,8 @@
 	{/if}
 
 	{#if active}
-		<div class="pointer-events-none absolute -inset-0.5 z-50 border-4 border-blue-400 rounded-lg"></div>
+		<div
+			class="pointer-events-none absolute -inset-0.5 z-50 rounded-lg border-4 border-blue-400"
+		></div>
 	{/if}
 </div>
