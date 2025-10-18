@@ -19,9 +19,11 @@ const DecisionMade = async ({ matchId, teamId, decision }: { teamId: string, dec
 
   // TODO: implement remained map
 
-  // TODO: bruh this will cause an error when picking side, so when selecting map, dont turn++ instead after picking side, turn++
+  // TODO: bruh this will cause an error when picking side, so when selecting map, dont turn++ instead after picking side, turn++, or nah just let it be
   if (matchMapPicks.isT1Turn && (match.t1.id !== teamId))
     return { type: "ERROR", message: "Not your turn" }
+  if (!matchMapPicks.timeTo)
+    return { type: "ERROR", message: "Finished" }
 
   let success: boolean = false
   if (decision.type == "VETO_MAP")
@@ -30,6 +32,8 @@ const DecisionMade = async ({ matchId, teamId, decision }: { teamId: string, dec
     success = matchMapPicks.pickSide({ teamId, side: decision.decision })
   else if (decision.type == "SELECT_MAP")
     success = matchMapPicks.select({ teamId, map: decision.decision, enemyTeamPick: "WAITING..." })
+
+  console.log("IN HANDLER,", success, matchMapPicks.toJSON())
 
   if (!success)
     return { type: "ERROR", message: "Invalid decision" }

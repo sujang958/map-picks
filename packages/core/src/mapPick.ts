@@ -1,6 +1,6 @@
 import typia from "typia";
 
-export type Side = "Attack" | "Defense"
+export type Side = "ATTACK" | "DEFENSE"
 
 export interface MapPickProps {
   t1Id: string;
@@ -58,16 +58,6 @@ export class MatchMapPicks {
     });
   }
 
-  get isT1Turn() {
-    return this.turn % 2 === 0;
-  }
-
-  get lastSelectedMap() {
-    if (this.t1Select.length <= 0) return null;
-    if (this.t1Select.length === this.t2Select.length) return { teamId: this.t2Id, map: this.t2Select.at(-1)! };
-    return { teamId: this.t1Id, map: this.t1Select.at(-1)! };
-  }
-
   // t1 veto - t2 veto - t1 select - t2 pick side - t2 select - t2 pick side - t1 veto - t2 veto - t1 pick side
   //    0    -    1    -     2     -      3       -      4    -        5     -    6     -    7    -     8
   get timeTo(): { who: "T1" | "T2", to: "VETO_MAP" | "SELECT_MAP" | "PICK_SIDE" } | null {
@@ -80,17 +70,27 @@ export class MatchMapPicks {
     else if (this.turn == 3)
       return { who: "T2", to: "PICK_SIDE" }
     else if (this.turn == 4)
-      return { who: "T1", to: "SELECT_MAP" }
+      return { who: "T2", to: "SELECT_MAP" }
     else if (this.turn == 5)
-      return { who: "T2", to: "PICK_SIDE" }
+      return { who: "T1", to: "PICK_SIDE" }
     else if (this.turn == 6)
       return { who: "T1", to: "VETO_MAP" }
     else if (this.turn == 7)
       return { who: "T2", to: "VETO_MAP" }
-    else if (this.turn == 7)
+    else if (this.turn == 8)
       return { who: "T1", to: "PICK_SIDE" }
     else
       return null
+  }
+
+  get isT1Turn() {
+    return this.timeTo?.who == "T1" // this.turn % 2 === 0;
+  }
+
+  get lastSelectedMap() {
+    if (this.t1Select.length <= 0) return null;
+    if (this.t1Select.length === this.t2Select.length) return { teamId: this.t2Id, map: this.t2Select.at(-1)! };
+    return { teamId: this.t1Id, map: this.t1Select.at(-1)! };
   }
 
   validateTurn(teamId: string) {
