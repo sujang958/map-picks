@@ -196,7 +196,9 @@
 									/>
 								</svg>
 							</p>
-							<p class="mt-1 text-sm text-neutral-500">{player?.side ?? 't2'}, Choosing a map...</p>
+							<p class="mt-1 text-sm text-neutral-500">
+								{player?.side ?? 't2'}, {isMyTurn ? 'Pondering...' : 'Waiting...'}
+							</p>
 						</div>
 					</header>
 					{#if matchParticipation?.canParticipate && player.side && isMyTurn && MapPicks?.timeTo}
@@ -206,7 +208,9 @@
 								: ''}"
 						>
 							{#if MapPicks?.timeTo?.to !== 'PICK_SIDE'}
-								<p class="text-base font-medium">Pick a Map to Veto / Select</p>
+								<p class="text-base font-medium">
+									Pick a Map to {{ VETO_MAP: 'Veto', SELECT_MAP: 'Select' }[MapPicks.timeTo.to]}
+								</p>
 								<!-- grid w-full auto-cols-auto grid-flow-col  -->
 								<div class="mt-4 flex flex-row flex-wrap items-center gap-2">
 									{#each Object.entries(MAPS).filter((map) => MapPicks?.availableMaps
@@ -226,7 +230,9 @@
 									{/each}
 								</div>
 							{:else}
-								<p class="text-base font-semibold">Pick a Side for Ascent</p>
+								<p class="text-base font-semibold">
+									Pick a Side for {MapPicks.lastSelectedMap?.map.map}
+								</p>
 								<div class="mt-4 flex flex-row items-center gap-x-3">
 									<button
 										type="button"
@@ -276,7 +282,9 @@
 							</svg>
 							{matchState[pov.opponent].name}
 						</p>
-						<p class="mt-1 text-sm text-neutral-500">{pov.opponent}, Waiting...</p>
+						<p class="mt-1 text-sm text-neutral-500">
+							{pov.opponent}, {isMyTurn ? 'Waiting...' : 'Pondering...'}
+						</p>
 					</header>
 				</div>
 			</div>{/if}
