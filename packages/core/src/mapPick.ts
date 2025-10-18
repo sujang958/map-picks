@@ -39,6 +39,10 @@ export class MatchMapPicks {
   public readonly t2Veto: Veto[] = [];
   public readonly t2Select: Select[] = [];
 
+  get getTurn() {
+    return this.turn
+  }
+
   private turn: number = 0;
 
   constructor({ t1Id, t2Id, mapPool, bestOf, turn = 0 }: MapPickProps) {

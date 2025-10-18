@@ -20,6 +20,7 @@ export const teams = pgTable('teams', {
     .defaultRandom()
     .notNull(),
 
+  password: text().notNull(),
 
   name: varchar('name', { length: 32 }).unique().notNull(),
 

@@ -1,5 +1,5 @@
 import jwt from "@elysiajs/jwt";
-import { Elysia } from "elysia";
+import { Elysia, status, t } from "elysia";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { matches, teams } from "./db/schema";
@@ -18,21 +18,27 @@ const app = new Elysia()
 
     return "Hello Elysia"
   })
-  .get('/login/:id', async ({ jwt, params: { id }, cookie: { auth } }) => {
-    const result = await db.query.teams.findFirst({ where: eq(teams.id, id) })
+  .post('/login', async ({ jwt, body: { teamId, password }, cookie: { auth } }) => {
+    const result = await db.query.teams.findFirst({ where: eq(teams.id, teamId) })
 
-    if (!result) return 'No such team'
+    const hash = await Bun.password.hash(password, "argon2id")
 
-    const value = await jwt.sign({ id })
+    if (!result) return status(404, { error: true, message: 'No such team' })
+    if (!await Bun.password.verify(password, hash)) return status(401, { error: true, message: 'No such team' })
+    const value = await jwt.sign({ id: teamId })
 
     auth.set({
       value,
       httpOnly: true,
       maxAge: 0.5 * 86400,
-
     })
 
-    return `Signed in as ${result.name}` // redirect to frontend page
+    return status(200, { message: `Signed in as ${result.name}` }) // redirect to frontend page
+  }, {
+    body: t.Object({
+      teamId: t.String(),
+      password: t.String()
+    })
   })
   .ws("/ws/:matchId", {
     async open(ws) {

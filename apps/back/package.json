@@ -4,7 +4,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/index.ts",
-    "prepare": "ts-patch install"
+    "prepare": "ts-patch install",
+    "drizzle": "drizzle-kit"
   },
   "dependencies": {
     "@elysiajs/jwt": "^1.4.0",

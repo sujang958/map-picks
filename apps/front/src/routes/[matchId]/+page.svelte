@@ -141,12 +141,20 @@
 		</h1>
 		{#if MapPicks}
 			<div class="mt-8 grid grid-cols-7">
-				<MapPick team="T1" active map={MAPS[MapPicks.t1Veto[0]?.map.toLowerCase() ?? '']?.image} />
-				<MapPick team="T2" map={MAPS[MapPicks.t2Veto[0]?.map.toLowerCase() ?? '']?.image} />
-
+				<MapPick
+					team="T1"
+					active={MapPicks.getTurn == 0}
+					map={MAPS[MapPicks.t1Veto[0]?.map.toLowerCase() ?? '']?.image}
+				/>
+				<MapPick
+					team="T2"
+					active={MapPicks.getTurn == 1}
+					map={MAPS[MapPicks.t2Veto[0]?.map.toLowerCase() ?? '']?.image}
+				/>
 				<MapPick
 					team="T1"
 					type="Select"
+					active={MapPicks.getTurn == 2 || MapPicks.getTurn == 3}
 					enemyTeam="T2"
 					enemyPicks={MapPicks.t1Select[0]?.enemyTeamPick ?? 'WAITING...'}
 					map={MAPS[MapPicks.t1Select[0]?.map.toLowerCase() ?? '']?.image}
@@ -154,6 +162,7 @@
 				<MapPick
 					team="T2"
 					type="Select"
+					active={MapPicks.getTurn == 4 || MapPicks.getTurn == 5}
 					enemyTeam="T1"
 					enemyPicks={MapPicks.t2Select[0]?.enemyTeamPick ?? 'WAITING...'}
 					map={MAPS[MapPicks.t2Select[0]?.map.toLowerCase() ?? '']?.image}
@@ -161,17 +170,20 @@
 				<MapPick
 					team="T1"
 					type="Veto"
+					active={MapPicks.getTurn == 6}
 					map={MAPS[MapPicks.t1Veto[1]?.map.toLowerCase() ?? '']?.image}
 				/>
 				<MapPick
 					team="T2"
 					type="Veto"
+					active={MapPicks.getTurn == 7}
 					map={MAPS[MapPicks.t2Veto[1]?.map.toLowerCase() ?? '']?.image}
 				/>
 				<MapPick
 					team=""
 					type="Remainder"
 					enemyTeam="T1"
+					active={MapPicks.getTurn == 8}
 					map={MAPS[MapPicks.t2Select[1]?.map.toLowerCase() ?? '']?.image}
 					enemyPicks={MapPicks.t2Select[1]?.enemyTeamPick ?? 'WAITING...'}
 				/>
