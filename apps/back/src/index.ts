@@ -61,11 +61,18 @@ const app = new Elysia()
 
       if (!team) return
 
-      console.log(team, matchId)
+      console.log(new Date(), message, team, matchId)
 
-      const request = typia.assert<WSRequest>(JSON.parse(String(message)))
-      if (request.type == "MATCH.DECISION_MADE")
-        return ws.send(SuperJSON.stringify(DecisionMade({ teamId: team.id as string, decision: request.payload, matchId })))
+      const parsed = SuperJSON.parse(JSON.stringify(message))
+
+      try {
+        if (!typia.is<WSRequest>(parsed)) return
+
+        if (parsed.type == "MATCH.DECISION_MADE")
+          return ws.send(SuperJSON.stringify(await DecisionMade({ teamId: team.id as string, decision: parsed.payload, matchId })))
+      } catch (e) {
+        console.log(e)
+      }
     },
   })
 

@@ -17,6 +17,8 @@ const DecisionMade = async ({ matchId, teamId, decision }: { teamId: string, dec
 
   const matchMapPicks = MatchMapPicks.fromJson(match.mapPicks)
 
+  // TODO: implement remained map
+
   // TODO: bruh this will cause an error when picking side, so when selecting map, dont turn++ instead after picking side, turn++
   if (matchMapPicks.isT1Turn && (match.t1.id !== teamId))
     return { type: "ERROR", message: "Not your turn" }

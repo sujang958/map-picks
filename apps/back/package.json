@@ -3,7 +3,8 @@
   "version": "1.0.50",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts"
+    "dev": "bun run --watch src/index.ts",
+    "prepare": "ts-patch install"
   },
   "dependencies": {
     "@elysiajs/jwt": "^1.4.0",
@@ -16,9 +17,12 @@
     "typia": "^9.7.2"
   },
   "devDependencies": {
-    "bun-types": "latest",
+    "@ryoppippi/unplugin-typia": "^2.6.5",
     "@self/types": "workspace:*",
-    "drizzle-kit": "^0.31.5"
+    "bun-types": "latest",
+    "drizzle-kit": "^0.31.5",
+    "ts-patch": "^3.3.0",
+    "typescript": "~5.9.2"
   },
   "module": "src/index.js"
 }

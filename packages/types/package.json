@@ -1,17 +1,23 @@
 {
   "name": "@self/types",
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "ts-patch": "^3.3.0"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "~5.9.2"
   },
   "exports": {
-    "./ws": "./src/ws.ts"
+    "./ws": "./src/ws.ts",
+    "./validators": "./src/validators.ts"
   },
   "dependencies": {
-    "@self/core": "workspace:*"
+    "@self/core": "workspace:*",
+    "typia": "^9.7.2"
   },
   "private": true,
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "prepare": "ts-patch install"
+  }
 }

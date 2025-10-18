@@ -3,7 +3,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import type { PageProps } from './$types';
 	import typia from 'typia';
-	import type { WSResponse } from '@self/types/ws';
+	import type { WSRequest, WSResponse } from '@self/types/ws';
 	import { MatchMapPicks, type JSONMatchMapPicks } from '@self/core';
 	import SuperJSON from 'superjson';
 
@@ -52,8 +52,10 @@
 	}));
 	let isMyTurn = $derived((player?.side ?? 't1') == 't1' && MapPicks?.isT1Turn);
 
+	let ws: WebSocket;
+
 	onMount(() => {
-		const ws = new WebSocket(`ws://localhost:3000/ws/${params.matchId}`);
+		ws = new WebSocket(`ws://localhost:3000/ws/${params.matchId}`);
 
 		ws.onopen = () => {
 			console.log('WebSocket connection opened');
@@ -80,6 +82,29 @@
 	$effect(() => {
 		console.log('MatchState Change', matchState);
 	});
+
+	let selectedMap = $state('');
+
+	const makeDecision = () => {
+		if (selectedMap.replaceAll(' ', '').length <= 0) return;
+		if (!MapPicks?.timeTo) return;
+		if (!matchState?.canParticipate) return;
+
+		const { to, who } = MapPicks.timeTo;
+		if (player.side?.toUpperCase() !== who) return;
+
+		if (to != 'PICK_SIDE') {
+			const req = {
+				type: 'MATCH.DECISION_MADE',
+				payload: {
+					type: to,
+					decision: selectedMap
+				}
+			} satisfies WSRequest;
+
+			ws.send(SuperJSON.stringify(req));
+		}
+	};
 </script>
 
 <div class="grid h-screen w-full place-items-center">
@@ -128,10 +153,16 @@
 								<!-- grid w-full auto-cols-auto grid-flow-col  -->
 								<div class="mt-4 flex flex-row flex-wrap items-center gap-2">
 									{#each Object.entries(MAPS) as [key, { name, image }] (key)}
-										<div class="w-24 cursor-pointer rounded-lg hover:ring-2 hover:ring-blue-500">
+										<button
+											type="button"
+											class="w-24 cursor-pointer overflow-hidden rounded-lg {selectedMap == name
+												? 'bg-neutral-200 ring-2 ring-red-900'
+												: 'hover:ring-2 hover:ring-blue-500'}"
+											onclick={() => (selectedMap = name)}
+										>
 											<img src={image} alt={name} class="size-24 object-cover" draggable="false" />
-											<p class="mt-0.5 py-0.5 text-sm font-normal text-neutral-500">{name}</p>
-										</div>
+											<p class="py-0.5 text-sm font-normal text-neutral-500">{name}</p>
+										</button>
 									{/each}
 								</div>
 							</main>
@@ -139,7 +170,8 @@
 								<div class="flex flex-row items-center justify-end gap-x-3">
 									<button
 										type="button"
-										class="cursor-pointer rounded-lg bg-red-200 px-4 py-1.5 font-medium text-red-800"
+										onclick={() => makeDecision()}
+										class="cursor-pointer rounded-lg bg-red-200 px-4 py-1.5 text-sm font-medium text-red-800 transition duration-200 hover:opacity-80"
 										>Lock In</button
 									>
 								</div>

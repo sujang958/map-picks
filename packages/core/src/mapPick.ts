@@ -25,6 +25,9 @@ export interface JSONMatchMapPicks {
   turn: number;
 }
 
+/**
+ * Currently, only supports bo3
+ */
 export class MatchMapPicks {
   public readonly t1Id: string;
   public readonly t2Id: string;
@@ -63,6 +66,31 @@ export class MatchMapPicks {
     if (this.t1Select.length <= 0) return null;
     if (this.t1Select.length === this.t2Select.length) return { teamId: this.t2Id, map: this.t2Select.at(-1)! };
     return { teamId: this.t1Id, map: this.t1Select.at(-1)! };
+  }
+
+  // t1 veto - t2 veto - t1 select - t2 pick side - t2 select - t2 pick side - t1 veto - t2 veto - t1 pick side
+  //    0    -    1    -     2     -      3       -      4    -        5     -    6     -    7    -     8
+  get timeTo(): { who: "T1" | "T2", to: "VETO_MAP" | "SELECT_MAP" | "PICK_SIDE" } | null {
+    if (this.turn == 0)
+      return { who: "T1", to: "VETO_MAP" }
+    else if (this.turn == 1)
+      return { who: "T2", to: "VETO_MAP" }
+    else if (this.turn == 2)
+      return { who: "T1", to: "SELECT_MAP" }
+    else if (this.turn == 3)
+      return { who: "T2", to: "PICK_SIDE" }
+    else if (this.turn == 4)
+      return { who: "T1", to: "SELECT_MAP" }
+    else if (this.turn == 5)
+      return { who: "T2", to: "PICK_SIDE" }
+    else if (this.turn == 6)
+      return { who: "T1", to: "VETO_MAP" }
+    else if (this.turn == 7)
+      return { who: "T2", to: "VETO_MAP" }
+    else if (this.turn == 7)
+      return { who: "T1", to: "PICK_SIDE" }
+    else
+      return null
   }
 
   validateTurn(teamId: string) {

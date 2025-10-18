@@ -27,9 +27,12 @@
         "typia": "^9.7.2",
       },
       "devDependencies": {
+        "@ryoppippi/unplugin-typia": "^2.6.5",
         "@self/types": "workspace:*",
         "bun-types": "latest",
         "drizzle-kit": "^0.31.5",
+        "ts-patch": "^3.3.0",
+        "typescript": "~5.9.2",
       },
     },
     "apps/front": {
@@ -76,12 +79,14 @@
       "name": "@self/types",
       "dependencies": {
         "@self/core": "workspace:*",
+        "typia": "^9.7.2",
       },
       "devDependencies": {
         "@types/bun": "latest",
+        "ts-patch": "^3.3.0",
       },
       "peerDependencies": {
-        "typescript": "^5",
+        "typescript": "~5.9.2",
       },
     },
   },
