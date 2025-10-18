@@ -89,7 +89,7 @@ export class MatchMapPicks {
 
   get lastSelectedMap() {
     if (this.t1Select.length <= 0) return null;
-    if (this.t1Select.length === this.t2Select.length) return { teamId: this.t2Id, map: this.t2Select.at(-1)! };
+    if (this.t1Select.length === this.t2Select.length || this.turn == 8) return { teamId: this.t2Id, map: this.t2Select.at(-1)! };
     return { teamId: this.t1Id, map: this.t1Select.at(-1)! };
   }
 
@@ -108,6 +108,10 @@ export class MatchMapPicks {
       this.t1Veto.push({ map });
     else
       this.t2Veto.push({ map });
+
+    if (this.turn == 7)
+      this.t2Select.push({ map: this.availableMaps[0]!, enemyTeamPick: "WAITING..." })
+
 
     this.turn++;
 

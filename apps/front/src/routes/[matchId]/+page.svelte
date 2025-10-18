@@ -136,7 +136,9 @@
 <div class="grid h-screen w-full place-items-center">
 	<main class="h-full w-full max-w-5xl rounded-lg px-8 py-16">
 		<h1 class="text-3xl font-semibold">Bo3 Map Picks</h1>
-		<h1 class="mt-2 text-base text-neutral-500">Time Limit 10:00</h1>
+		<h1 class="mt-2 text-base text-neutral-500">
+			Time Limit 10:00, Match created on {matchState?.createdAt.toLocaleString()}
+		</h1>
 		{#if MapPicks}
 			<div class="mt-8 grid grid-cols-7">
 				<MapPick team="T1" active map={MAPS[MapPicks.t1Veto[0]?.map.toLowerCase() ?? '']?.image} />
@@ -166,7 +168,13 @@
 					type="Veto"
 					map={MAPS[MapPicks.t2Veto[1]?.map.toLowerCase() ?? '']?.image}
 				/>
-				<MapPick team="" type="Remainder" enemyTeam="T1" />
+				<MapPick
+					team=""
+					type="Remainder"
+					enemyTeam="T1"
+					map={MAPS[MapPicks.t2Select[1]?.map.toLowerCase() ?? '']?.image}
+					enemyPicks={MapPicks.t2Select[1]?.enemyTeamPick ?? 'WAITING...'}
+				/>
 			</div>
 		{/if}
 
@@ -197,7 +205,11 @@
 								</svg>
 							</p>
 							<p class="mt-1 text-sm text-neutral-500">
-								{player?.side ?? 't2'}, {isMyTurn ? 'Pondering...' : 'Waiting...'}
+								{player?.side ?? 't2'},
+								{#if !MapPicks?.timeTo}
+									Finished{:else}
+									{isMyTurn ? 'Pondering...' : 'Waiting...'}
+								{/if}
 							</p>
 						</div>
 					</header>
@@ -283,7 +295,10 @@
 							{matchState[pov.opponent].name}
 						</p>
 						<p class="mt-1 text-sm text-neutral-500">
-							{pov.opponent}, {isMyTurn ? 'Waiting...' : 'Pondering...'}
+							{pov.opponent}, {#if !MapPicks?.timeTo}
+								Finished{:else}
+								{!isMyTurn ? 'Pondering...' : 'Waiting...'}
+							{/if}
 						</p>
 					</header>
 				</div>
