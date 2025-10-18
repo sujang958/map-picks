@@ -94,9 +94,10 @@ const app = new Elysia()
         if (!typia.is<WSRequest>(parsed)) return
 
         if (parsed.type == "MATCH.DECISION_MADE") {
-          const res = await DecisionMade({ teamId: team.id as string, decision: parsed.payload, matchId })
+          const res = SuperJSON.stringify(await DecisionMade({ teamId: team.id as string, decision: parsed.payload, matchId }))
 
-          return ws.publish(`MATCH:${matchId}`, SuperJSON.stringify(res))
+          ws.send(res)
+          return ws.publish(`MATCH:${matchId}`, res)
         }
       } catch (e) {
         console.log(e)

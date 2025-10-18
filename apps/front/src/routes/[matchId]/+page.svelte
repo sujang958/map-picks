@@ -61,7 +61,7 @@
 				}
 			: { my: 't1' as const, opponent: 't2' as const }
 	);
-	let isMyTurn = $derived(pov.my == 't1' && MapPicks?.isT1Turn);
+	let isMyTurn = $derived(pov.my == 't1' ? MapPicks?.isT1Turn : !MapPicks?.isT1Turn);
 	// let isMyTurn = $derived(
 	// 	((player?.side ?? 't1') == 't1' && MapPicks?.isT1Turn) ||
 	// 		(player?.side == 't2' && !MapPicks?.isT1Turn)
