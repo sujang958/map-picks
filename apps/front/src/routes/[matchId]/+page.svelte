@@ -50,7 +50,10 @@
 	let player = $derived.by(() => ({
 		side: matchState?.canParticipate ? (matchState.amIT1 ? ('t1' as const) : ('t2' as const)) : null
 	}));
-	let isMyTurn = $derived((player?.side ?? 't1') == 't1' && MapPicks?.isT1Turn);
+	let isMyTurn = $derived(
+		((player?.side ?? 't1') == 't1' && MapPicks?.isT1Turn) ||
+			(player?.side == 't2' && !MapPicks?.isT1Turn)
+	);
 
 	let ws: WebSocket;
 
@@ -80,7 +83,7 @@
 	});
 
 	$effect(() => {
-		console.log('MatchState Change', matchState);
+		console.log('MatchState Change', matchState, MapPicks?.isT1Turn, player, isMyTurn);
 	});
 
 	let selectedMap = $state('');
