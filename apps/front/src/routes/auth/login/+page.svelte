@@ -14,7 +14,8 @@
 			const res = await fetch(`http://localhost:3000/login`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ teamName, password })
+				body: JSON.stringify({ teamName, password }),
+				credentials: 'include' // fuck this
 			});
 
 			console.log('asdfa');
@@ -25,6 +26,10 @@
 			if (body?.error) return toast.error('Wrong');
 
 			loggedIn = body.message;
+
+			fetch(`http://localhost:3000/matches`, { credentials: 'include' })
+				.then((res) => res.json())
+				.then(console.log);
 		} catch (e) {
 			console.log(e);
 		} finally {

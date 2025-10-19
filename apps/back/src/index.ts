@@ -1,33 +1,55 @@
 import jwt from "@elysiajs/jwt";
 import { Elysia, status, t } from "elysia";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 import { matches, teams } from "./db/schema";
 import type { WSRequest, WSResponse } from "@self/types/ws";
 import typia from "typia";
-import ErrorResponse from "./ws/Error";
 import DecisionMade from "./ws/DecisionMade";
 import Open from "./ws/Open";
 import SuperJSON from "superjson";
 import { getMatch } from "./db/utils";
 import cors from "@elysiajs/cors";
 
+
 const app = new Elysia()
+
+app
   .use(jwt({ name: "jwt", secret: process.env.JWT_SECRET! }))
-  .get("/", ({ cookie }) => {
-    console.log(cookie)
-
-    return "Hello Elysia"
-  })
   .use(cors({
-    // origin
-    //   : "localhost"
-    // TODO: fix this, no *
+    origin: /localhost:*\/*/gi,
   }))
-  .post('/login', async ({ jwt, body: { teamName, password }, cookie: { auth } }) => {
-    console.log(teamName, password)
+  // .onBeforeHandle((a) => {
+  //   console.log(a.cookie, "before1")
+  // })
+  // .onAfterHandle((a) => {
+  //   console.log(a.cookie, "after1")
+  // })
+  .get('/matches', async ({
+    jwt,
+    cookie: { auth }
+  }) => {
+    const team = await jwt.verify(auth.value as string)
+    console.log(auth.value)
 
+    if (!team) return status(401, { error: true, message: "not signed in " })
+
+    const teamId = String(team.id)
+
+    const teamMatches = db.query.matches.findMany({
+      where: or(eq(matches.t1Id, teamId), eq(matches.t2Id, teamId)),
+      with: {
+        mapPool: true,
+        t1: { columns: { password: false } },
+        t2: { columns: { password: false } }
+      }
+    })
+
+    return teamMatches
+  }, { cookie: t.Cookie({ auth: t.String() }) })
+  .post('/login', async ({ jwt, body: { teamName, password }, cookie: { auth } }) => {
     const result = await db.query.teams.findFirst({ where: eq(teams.name, teamName) })
+
     if (!result) return status(404, { error: true, message: 'No such team' })
     if (!result?.password) return status(404, { error: true, message: "Password not found" })
 
@@ -117,8 +139,6 @@ const app = new Elysia()
       }
     },
   })
-
-// TODO: just create a passwor dor at least simple pin and make a frontend page for that not a big deal right?
 
 
 app.listen(3000);

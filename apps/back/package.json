@@ -15,6 +15,7 @@
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.44.6",
     "elysia": "latest",
+    "elysia-rate-limit": "^4.4.1",
     "postgres": "^3.4.7",
     "typia": "^9.7.2"
   },
