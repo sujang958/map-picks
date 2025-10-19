@@ -7,6 +7,8 @@
 	let loggedIn = $state(null);
 	let loading = $state(false);
 
+	let matches = $state<any[]>([]);
+
 	const login = async () => {
 		loading = true;
 
@@ -27,9 +29,10 @@
 
 			loggedIn = body.message;
 
-			fetch(`http://localhost:3000/matches`, { credentials: 'include' })
-				.then((res) => res.json())
-				.then(console.log);
+			const matchRes = await fetch(`http://localhost:3000/matches`, { credentials: 'include' });
+			const matchJson = await matchRes.json();
+
+			matches = matchJson;
 		} catch (e) {
 			console.log(e);
 		} finally {
@@ -46,6 +49,14 @@
 	>
 		{#if loggedIn}
 			<p class="text-lg font-semibold">{loggedIn}</p>
+
+			<!-- <div class="flex flex-col gap-y-1 py-3">
+				{#each matches as match}
+					<div class="w-full">
+						<p class="text">{loggedIn} vs. {match.t2.name}</p>
+					</div>
+				{/each}
+			</div> -->
 		{:else}
 			<p class="text-xl font-semibold">Login</p>
 			<div class="py-1"></div>
