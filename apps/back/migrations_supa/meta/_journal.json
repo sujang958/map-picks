@@ -15,6 +15,34 @@
       "when": 1760590282631,
       "tag": "0001_lazy_polaris",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1760861218774,
+      "tag": "0002_gigantic_hairball",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1760861455426,
+      "tag": "0003_magenta_mach_iv",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1760861607340,
+      "tag": "0004_certain_red_shift",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1760861906742,
+      "tag": "0005_plain_cerise",
+      "breakpoints": true
     }
   ]
 }

@@ -20,8 +20,7 @@ export const teams = pgTable('teams', {
     .defaultRandom()
     .notNull(),
 
-  password: text().notNull(),
-
+  password: text(),
   name: varchar('name', { length: 32 }).unique().notNull(),
 
   ...createdAtHelper,
@@ -64,7 +63,7 @@ export const mapPools = pgTable('mapPools', {
   ...createdAtHelper,
 });
 
-export const teamsRelations = relations(teams, ({ many }) => ({
+export const teamsRelations = relations(teams, ({ many, one }) => ({
   matches: many(matches),
 }));
 

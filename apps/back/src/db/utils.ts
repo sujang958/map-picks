@@ -9,7 +9,14 @@ const fixMatchMapPicks = (mapPicks: any, match: typeof matches.$inferSelect & { 
 }
 
 const unifyJsonMapPicks = async (matchId: string) => {
-  const match = await db.query.matches.findFirst({ where: eq(matches.id, matchId), with: { mapPool: true, t1: true, t2: true } })
+  const match = await db.query.matches.findFirst({
+    where: eq(matches.id, matchId), with: {
+      mapPool: true, t1: {
+        columns:
+          { password: false, }
+      }, t2: { columns: { password: false, } }
+    }
+  })
   if (!match) return null
 
   if (match.mapPicks.t1Id == match.t1Id && match.mapPicks.t2Id == match.t2Id && JSON.stringify(match.mapPicks.mapPool) === JSON.stringify(match.mapPool.maps))

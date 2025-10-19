@@ -2,3 +2,7 @@ preload = ["./preload.ts"]
  
 [test]
 preload = ["./preload.ts"]
+
+
+## IMPORTANT NOTES: When generating migration files with drizzle kit, you should disable all this file or like the preload i guess theres a problem with it
+## THERES A problem at plugin()

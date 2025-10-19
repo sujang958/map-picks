@@ -8,6 +8,7 @@
     "drizzle": "drizzle-kit"
   },
   "dependencies": {
+    "@elysiajs/cors": "^1.4.0",
     "@elysiajs/jwt": "^1.4.0",
     "@libsql/client": "^0.15.15",
     "@self/core": "workspace:*",

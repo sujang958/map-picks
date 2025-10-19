@@ -1,0 +1,1 @@
+ALTER TABLE "teams" ALTER COLUMN "password" SET DEFAULT '0';

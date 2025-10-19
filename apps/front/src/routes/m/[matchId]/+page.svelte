@@ -1,11 +1,11 @@
 <script lang="ts">
 	import MapPick from '$lib/components/MapPick.svelte';
 	import { onDestroy, onMount } from 'svelte';
-	import type { PageProps } from './$types';
 	import typia from 'typia';
 	import type { WSRequest, WSResponse } from '@self/types/ws';
 	import { MatchMapPicks, type JSONMatchMapPicks, type Side } from '@self/core';
 	import SuperJSON from 'superjson';
+	import type { PageProps } from './$types';
 
 	let { params }: PageProps = $props();
 

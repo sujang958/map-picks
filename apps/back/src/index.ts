@@ -10,6 +10,7 @@ import DecisionMade from "./ws/DecisionMade";
 import Open from "./ws/Open";
 import SuperJSON from "superjson";
 import { getMatch } from "./db/utils";
+import cors from "@elysiajs/cors";
 
 const app = new Elysia()
   .use(jwt({ name: "jwt", secret: process.env.JWT_SECRET! }))
@@ -18,14 +19,20 @@ const app = new Elysia()
 
     return "Hello Elysia"
   })
-  .post('/login', async ({ jwt, body: { teamId, password }, cookie: { auth } }) => {
-    const result = await db.query.teams.findFirst({ where: eq(teams.id, teamId) })
+  .use(cors({
+    // origin
+    //   : "localhost"
+    // TODO: fix this, no *
+  }))
+  .post('/login', async ({ jwt, body: { teamName, password }, cookie: { auth } }) => {
+    console.log(teamName, password)
 
-    const hash = await Bun.password.hash(password, "argon2id")
-
+    const result = await db.query.teams.findFirst({ where: eq(teams.name, teamName) })
     if (!result) return status(404, { error: true, message: 'No such team' })
-    if (!await Bun.password.verify(password, hash)) return status(401, { error: true, message: 'No such team' })
-    const value = await jwt.sign({ id: teamId })
+    if (!result?.password) return status(404, { error: true, message: "Password not found" })
+
+    if (!await Bun.password.verify(password, result.password)) return status(401, { error: true, message: 'No such team' })
+    const value = await jwt.sign({ id: result.id })
 
     auth.set({
       value,
@@ -36,7 +43,8 @@ const app = new Elysia()
     return status(200, { message: `Signed in as ${result.name}` }) // redirect to frontend page
   }, {
     body: t.Object({
-      teamId: t.String(),
+      // teamId: t.String(),
+      teamName: t.String(),
       password: t.String()
     })
   })
@@ -58,7 +66,6 @@ const app = new Elysia()
       const team = await ws.data.jwt.verify(ws.data.cookie.auth.value as string)
 
       console.log(team, matchId)
-
 
       if (team && team.id) {
         const match = await getMatch(matchId)
